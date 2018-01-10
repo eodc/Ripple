@@ -34,4 +34,6 @@ dependencies {
     compile 'com.r0adkll:slidableactivity:2.0.6'
     // LibPhoneNumber https://github.com/googlei18n/libphonenumber
     compile 'com.googlecode.libphonenumber:libphonenumber:8.8.8'
+    // AndroidSlidingUpPanel https://github.com/umano/AndroidSlidingUpPanel
+    compile 'com.sothree.slidinguppanel:library:3.4.0'
 }
