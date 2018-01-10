@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">Ripple</string>
+
+    <string name="char_count" translatable="false">%d/160</string>
+
+    <string name="msg_composer_hint">Enter Message…</string>
+
+    <string name="date_divider">- %s -</string>
+</resources>
