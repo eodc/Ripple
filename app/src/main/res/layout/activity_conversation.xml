@@ -29,7 +29,7 @@
             android:layout_below="@id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:layout="@layout/conversation_fragment" />
+            tools:layout="@layout/fragment_conversation" />
 
     </RelativeLayout>
 
@@ -41,8 +41,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:gravity="center|top"
-        android:background="@android:color/white"
-        tools:ignore="RtlSymmetry">
+        android:background="@android:color/white">
 
         <ImageView
             android:id="@+id/attach_icon"

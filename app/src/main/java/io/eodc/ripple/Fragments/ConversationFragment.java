@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.content.AsyncQueryHandler;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.Telephony;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,7 +36,7 @@ public class ConversationFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View conversation = inflater.inflate(R.layout.conversation_fragment, container, false);
+        View conversation = inflater.inflate(R.layout.fragment_conversation, container, false);
         RecyclerView conversationMsgs = conversation.findViewById(R.id.conversation_msgs);
         if (savedInstanceState == null) {
             messages = new ArrayList<>();

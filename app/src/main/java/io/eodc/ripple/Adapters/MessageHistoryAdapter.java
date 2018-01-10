@@ -39,11 +39,11 @@ public class MessageHistoryAdapter extends RecyclerView.Adapter<MessageHistoryAd
         View view;
         if (viewType == VIEW_TYPE_SENT || viewType == VIEW_TYPE_SENT_DIVIDER) {
             view = LayoutInflater.from(mContext)
-                    .inflate(R.layout.message_item_sent, parent, false);
+                    .inflate(R.layout.item_message_sent, parent, false);
             return new MessageHolder(view);
         } else if (viewType == VIEW_TYPE_RECEIVE || viewType == VIEW_TYPE_RECEIVE_DIVIDER) {
             view = LayoutInflater.from(mContext)
-                    .inflate(R.layout.message_item_received, parent, false);
+                    .inflate(R.layout.item_message_received, parent, false);
             return new MessageHolder(view);
         } else
             return null;
