@@ -53,6 +53,7 @@
             android:focusable="true"
             android:layout_marginTop="12dp"
             android:padding="@dimen/attach_icon_padding"
+            android:contentDescription="@string/ic_attach_content_description"
             app:srcCompat="@drawable/ic_attach_action" />
 
         <EditText

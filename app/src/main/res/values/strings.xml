@@ -1,10 +1,7 @@
 <resources>
 
     <string name="app_name">Ripple</string>
-
-    <string name="char_count" translatable="false">%d/160</string>
-
+    <string name="ic_attach_content_description">Attach a file</string>
     <string name="msg_composer_hint">Enter Message…</string>
-
-    <string name="date_divider">- %s -</string>
+    <string name="date_divider" translatable="false">- %s -</string>
 </resources>
