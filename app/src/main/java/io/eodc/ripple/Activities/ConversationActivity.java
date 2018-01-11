@@ -43,7 +43,9 @@ public class ConversationActivity extends AppCompatActivity {
         // Initialize UI
         Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Timber.i("Toolbar initialized");
 
         slidingLayout = findViewById(R.id.root_layout);

@@ -22,7 +22,7 @@ import io.eodc.ripple.R;
 import io.eodc.ripple.TextMessage;
 
 /**
- * Created by 2n on 1/6/18.
+ * Fragment containing the RecyclerView that contains the message history
  */
 
 public class ConversationFragment extends Fragment {

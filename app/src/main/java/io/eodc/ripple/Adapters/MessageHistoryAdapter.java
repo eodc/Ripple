@@ -11,13 +11,14 @@ import android.widget.TextView;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.eodc.ripple.TextMessage;
 import io.eodc.ripple.R;
 import timber.log.Timber;
 
 /**
- * Created by 2n on 1/4/18.
+ * Adapter for showing the history of texts
  */
 
 public class MessageHistoryAdapter extends RecyclerView.Adapter<MessageHistoryAdapter.MessageHolder> {
@@ -28,6 +29,8 @@ public class MessageHistoryAdapter extends RecyclerView.Adapter<MessageHistoryAd
     private final int VIEW_TYPE_RECEIVE = 1;
     private final int VIEW_TYPE_SENT_DIVIDER = 2;
     private final int VIEW_TYPE_RECEIVE_DIVIDER = 3;
+    private final int VIEW_TYPE_SENT_DATE_VIS = 4;
+    private final int VIEW_TYPE_RECEIVE_DATE_VIS = 5;
 
     public MessageHistoryAdapter(List<TextMessage> messageList, Context context) {
         mMessageList = messageList;
@@ -37,11 +40,11 @@ public class MessageHistoryAdapter extends RecyclerView.Adapter<MessageHistoryAd
     @Override
     public MessageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
-        if (viewType == VIEW_TYPE_SENT || viewType == VIEW_TYPE_SENT_DIVIDER) {
+        if (viewType == VIEW_TYPE_SENT || viewType == VIEW_TYPE_SENT_DIVIDER || viewType == VIEW_TYPE_SENT_DATE_VIS) {
             view = LayoutInflater.from(mContext)
                     .inflate(R.layout.item_message_sent, parent, false);
             return new MessageHolder(view);
-        } else if (viewType == VIEW_TYPE_RECEIVE || viewType == VIEW_TYPE_RECEIVE_DIVIDER) {
+        } else if (viewType == VIEW_TYPE_RECEIVE || viewType == VIEW_TYPE_RECEIVE_DIVIDER || viewType == VIEW_TYPE_RECEIVE_DATE_VIS) {
             view = LayoutInflater.from(mContext)
                     .inflate(R.layout.item_message_received, parent, false);
             return new MessageHolder(view);
@@ -59,13 +62,21 @@ public class MessageHistoryAdapter extends RecyclerView.Adapter<MessageHistoryAd
             Calendar lastMsgCal = Calendar.getInstance();
             thisMsgCal.setTime(new Date(message.getDate()));
             lastMsgCal.setTime(new Date(lastMsg.getDate()));
+            long minSinceLastMsg = TimeUnit.MILLISECONDS.toMinutes(message.getDate() - lastMsg.getDate());
 
             if (!(thisMsgCal.get(Calendar.YEAR) == lastMsgCal.get(Calendar.YEAR) &&
                     thisMsgCal.get(Calendar.DAY_OF_YEAR) == lastMsgCal.get(Calendar.DAY_OF_YEAR))) {
+                // Not from same day
                 if (message.isFromUser())
                     return VIEW_TYPE_SENT_DIVIDER;
                 else
                     return VIEW_TYPE_RECEIVE_DIVIDER;
+            } else if (minSinceLastMsg > 30) {
+                // 30 mins since last message
+                if (message.isFromUser())
+                    return VIEW_TYPE_SENT_DATE_VIS;
+                else
+                    return VIEW_TYPE_RECEIVE_DATE_VIS;
             }
         } else if (position == mMessageList.size() - 1) {
             if (message.isFromUser())
@@ -82,6 +93,8 @@ public class MessageHistoryAdapter extends RecyclerView.Adapter<MessageHistoryAd
     @Override
     public void onBindViewHolder(MessageHolder holder, int position) {
         TextMessage message = mMessageList.get(position);
+        int holderType = holder.getItemViewType();
+
         final TextView content = holder.content;
         final TextView date = holder.date;
 
@@ -106,12 +119,17 @@ public class MessageHistoryAdapter extends RecyclerView.Adapter<MessageHistoryAd
                     }
                 }
             });
-        if (holder.getItemViewType() == VIEW_TYPE_RECEIVE_DIVIDER || holder.getItemViewType() == VIEW_TYPE_SENT_DIVIDER) {
+
+        if (holderType == VIEW_TYPE_RECEIVE_DATE_VIS || holderType == VIEW_TYPE_SENT_DATE_VIS)
+            date.setVisibility(View.VISIBLE);
+
+        else if (holderType == VIEW_TYPE_RECEIVE_DIVIDER || holderType == VIEW_TYPE_SENT_DIVIDER) {
             holder.divider.setText(mContext.getString(R.string.date_divider,
                     DateUtils.formatDateTime(mContext,
                             message.getDate(),
                             DateUtils.FORMAT_ABBREV_MONTH | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY)));
             holder.divider.setVisibility(View.VISIBLE);
+            date.setVisibility(View.VISIBLE);
         }
     }
 
