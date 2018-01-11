@@ -3,10 +3,19 @@
     <dimen name="toolbar_elevation">4dp</dimen>
     <dimen name="msg_container_vertical_padding">8dp</dimen>
     <dimen name="msg_container_horizontal_padding">16dp</dimen>
+    <dimen name="msg_container_element_vertical_padding">12dp</dimen>
     <dimen name="attach_icon_size">42dp</dimen>
     <dimen name="attach_icon_padding">8dp</dimen>
     <dimen name="attach_icon_horizontal_margin">8dp</dimen>
-    <dimen name="msg_composer_right_margin">64dp</dimen>
-    <dimen name="fab_size">56dp</dimen>
-    <dimen name="fab_right_margin">16dp</dimen>
+    <dimen name="send_button_size">56dp</dimen>
+    <dimen name="send_button_horizontal_margin">16dp</dimen>
+    <dimen name="send_button_vertical_margin">6dp</dimen>
+
+    <dimen name="item_message_divider_margin">8dp</dimen>
+    <dimen name="item_message_content_max_width">240sp</dimen>
+    <dimen name="item_message_content_padding">8dp</dimen>
+    <dimen name="item_message_content_vertical_margin">8dp</dimen>
+    <dimen name="item_message_content_horizontal_margin">6dp</dimen>
+    <dimen name="item_message_timestamp_horizontal_margin">2dp</dimen>
+    <dimen name="item_message_timestamp_text_size">12sp</dimen>
 </resources>
