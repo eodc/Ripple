@@ -2,6 +2,7 @@
 
     <string name="app_name">Ripple</string>
     <string name="ic_attach_content_description">Attach a file</string>
+    <string name="attach_drawer_divider_content_description">Below you may attach files</string>
     <string name="msg_composer_hint">Enter Message…</string>
     <string name="date_divider" translatable="false">- %s -</string>
 </resources>

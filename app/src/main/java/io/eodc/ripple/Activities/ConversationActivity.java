@@ -1,6 +1,7 @@
 package io.eodc.ripple.Activities;
 
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -35,6 +36,12 @@ public class ConversationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_conversation);
         smsManager = SmsManager.getDefault();
         Slidr.attach(this);
+
+        if (savedInstanceState != null) {
+            String savedMsgContent = savedInstanceState.getString("savedMsgContent");
+            if (savedMsgContent != null)
+                mMessageComposer.setText(savedMsgContent);
+        }
 
         // Plant Timber tree if debug build
         if (BuildConfig.DEBUG)
@@ -79,6 +86,9 @@ public class ConversationActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (mMessageComposer.getLineCount() == 0)
+                return;
+
             if (numLines < mMessageComposer.getLineCount() && mMessageComposer.getLineCount() <= 5) {
                 numLines = mMessageComposer.getLineCount();
                 int deltaHeight = mMessageComposer.getHeight() / numLines;
@@ -111,6 +121,12 @@ public class ConversationActivity extends AppCompatActivity {
         public void afterTextChanged(Editable editable) {
 
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putString("savedMsgContent", mMessageComposer.getText().toString());
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 }
 
