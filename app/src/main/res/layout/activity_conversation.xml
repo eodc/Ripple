@@ -9,11 +9,14 @@
     android:gravity="bottom"
     app:umanoFadeColor="@android:color/transparent"
     app:umanoDragView="@id/new_message_container"
+    app:umanoPanelHeight="68dp"
     tools:context="io.eodc.ripple.Activities.ConversationActivity">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center">
+
         <android.support.v7.widget.Toolbar
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/toolbar"
@@ -41,65 +44,25 @@
         android:layout_weight="0.6"
         android:clickable="true"
         android:focusable="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
         android:gravity="center|top"
         android:background="@android:color/white">
-        <RelativeLayout
-            android:id="@+id/new_message_container"
+
+        <include
+            android:id="@+id/message_composer_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/attach_icon"
-                android:layout_width="@dimen/attach_icon_size"
-                android:layout_height="@dimen/attach_icon_size"
-                android:layout_marginStart="@dimen/attach_icon_horizontal_margin"
-                android:layout_marginTop="@dimen/msg_container_element_vertical_padding"
-                android:padding="@dimen/attach_icon_padding"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="@string/ic_attach_content_description"
-                app:srcCompat="@drawable/ic_attach_action" />
+            android:layout_height="68dp"
+            layout="@layout/activity_conversation_composer_drawer" />
 
-            <EditText
-                android:id="@+id/message_composer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/attach_icon"
-                android:layout_toStartOf="@id/send_button"
-                android:layout_marginTop="@dimen/msg_container_element_vertical_padding"
-                android:focusable="true"
-                android:hint="@string/msg_composer_hint"
-                android:imeOptions="actionNext|flagNoExtractUi"
-                android:inputType="textShortMessage|textCapSentences|textMultiLine"
-                android:maxLines="5" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/send_button"
-                android:layout_width="@dimen/send_button_size"
-                android:layout_height="@dimen/send_button_size"
-                android:layout_marginStart="@dimen/send_button_horizontal_margin"
-                android:layout_marginEnd="@dimen/send_button_horizontal_margin"
-                android:layout_marginTop="@dimen/send_button_vertical_margin"
-                android:layout_marginBottom="@dimen/send_button_vertical_margin"
-                android:layout_alignParentEnd="true"
-                android:clickable="true"
-                android:focusable="true"
-                android:onClick="sendMessage"
-                android:scaleType="center"
-                app:srcCompat="@drawable/ic_action_send" />
-        </RelativeLayout>
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="@dimen/attach_drawer_divider_height"
             android:layout_marginStart="@dimen/attach_drawer_divider_horizontal_margin"
             android:layout_marginEnd="@dimen/attach_drawer_divider_horizontal_margin"
-            android:layout_marginTop="@dimen/attach_drawer_divider_vertical_margin"
-            android:layout_marginBottom="@dimen/attach_drawer_divider_vertical_margin"
             android:background="@android:color/darker_gray"
-            android:layout_below="@id/new_message_container"
-            android:contentDescription="@string/attach_drawer_divider_content_description"/>
+            android:layout_below="@id/message_composer_container"
+            android:contentDescription="@string/attach_drawer_divider_content_description"
+            android:id="@+id/imageView" />
+
     </RelativeLayout>
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="toolbar_elevation">4dp</dimen>
-    <dimen name="msg_container_vertical_padding">8dp</dimen>
-    <dimen name="msg_container_horizontal_padding">16dp</dimen>
-    <dimen name="msg_container_element_vertical_padding">12dp</dimen>
+
     <dimen name="attach_icon_size">42dp</dimen>
     <dimen name="attach_icon_padding">8dp</dimen>
-    <dimen name="attach_icon_horizontal_margin">8dp</dimen>
     <dimen name="send_button_size">56dp</dimen>
-    <dimen name="send_button_horizontal_margin">16dp</dimen>
-    <dimen name="send_button_vertical_margin">6dp</dimen>
 
     <dimen name="item_message_divider_margin">8dp</dimen>
     <dimen name="item_message_content_max_width">240sp</dimen>

@@ -28,6 +28,7 @@ public class ConversationActivity extends AppCompatActivity {
     ImageView mAttachIcon;
     EditText mMessageComposer;
     FloatingActionButton mSendButton;
+    RelativeLayout mComposerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,10 @@ public class ConversationActivity extends AppCompatActivity {
         mMessageComposer = findViewById(R.id.message_composer);
         mMessageComposer.addTextChangedListener(new TextLineCountListener());
 
+        mComposerLayout = findViewById(R.id.message_composer_container);
+
         mSendButton = findViewById(R.id.send_button);
+
     }
 
     public void sendMessage(View view) {
@@ -89,32 +93,21 @@ public class ConversationActivity extends AppCompatActivity {
             if (mMessageComposer.getLineCount() == 0)
                 return;
 
+            int composerHeight = mComposerLayout.getMeasuredHeight();
+            RelativeLayout.LayoutParams composerLayoutParams = (RelativeLayout.LayoutParams) mComposerLayout.getLayoutParams();
+
             if (numLines < mMessageComposer.getLineCount() && mMessageComposer.getLineCount() <= 5) {
                 numLines = mMessageComposer.getLineCount();
                 int deltaHeight = mMessageComposer.getHeight() / numLines;
-                slidingLayout.setPanelHeight((slidingLayout.getPanelHeight() + deltaHeight));
-
-                RelativeLayout.LayoutParams attachIconParams = (RelativeLayout.LayoutParams) mAttachIcon.getLayoutParams();
-                attachIconParams.topMargin = attachIconParams.topMargin + deltaHeight / 2;
-                mAttachIcon.setLayoutParams(attachIconParams);
-
-                RelativeLayout.LayoutParams sendButtonParams = (RelativeLayout.LayoutParams) mSendButton.getLayoutParams();
-                sendButtonParams.topMargin = sendButtonParams.topMargin + deltaHeight / 2;
-                mSendButton.setLayoutParams(sendButtonParams);
+                slidingLayout.setPanelHeight(slidingLayout.getPanelHeight() + deltaHeight);
+                composerLayoutParams.height = composerHeight + deltaHeight;
 
             } else if (numLines > mMessageComposer.getLineCount()) {
                 numLines = mMessageComposer.getLineCount();
-                int deltaHeight = slidingLayout.getPanelHeight() - mMessageComposer.getHeight();
-                slidingLayout.setPanelHeight((mMessageComposer.getHeight()));
-
-                RelativeLayout.LayoutParams attachIconParams = (RelativeLayout.LayoutParams) mAttachIcon.getLayoutParams();
-                attachIconParams.topMargin = attachIconParams.topMargin - deltaHeight / 2;
-                mAttachIcon.setLayoutParams(attachIconParams);
-
-                RelativeLayout.LayoutParams sendButtonParams = (RelativeLayout.LayoutParams) mSendButton.getLayoutParams();
-                sendButtonParams.topMargin = sendButtonParams.topMargin - deltaHeight / 2;
-                mSendButton.setLayoutParams(sendButtonParams);
+                slidingLayout.setPanelHeight(mMessageComposer.getHeight());
+                composerLayoutParams.height = mMessageComposer.getHeight();
             }
+            mComposerLayout.setLayoutParams(composerLayoutParams);
         }
 
         @Override
