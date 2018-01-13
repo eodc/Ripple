@@ -14,6 +14,10 @@
     <dimen name="item_message_timestamp_horizontal_margin">2dp</dimen>
     <dimen name="item_message_timestamp_text_size">12sp</dimen>
 
+    <dimen name="message_composer_horizontal_margin">8dp</dimen>
+    <dimen name="message_composer_input_horizontal_margin">2dp</dimen>
+
+    <dimen name="attach_drawer_panel_default_height">68dp</dimen>
     <dimen name="attach_drawer_divider_height">1dp</dimen>
     <dimen name="attach_drawer_divider_horizontal_margin">16dp</dimen>
     <dimen name="attach_drawer_divider_vertical_margin">8dp</dimen>

@@ -72,7 +72,6 @@ public class ConversationActivity extends AppCompatActivity {
         mMessageComposer.addTextChangedListener(new TextLineCountListener());
 
         mComposerLayout = findViewById(R.id.message_composer_container);
-
         mSendButton = findViewById(R.id.send_button);
 
     }

@@ -9,7 +9,7 @@
     android:gravity="bottom"
     app:umanoFadeColor="@android:color/transparent"
     app:umanoDragView="@id/new_message_container"
-    app:umanoPanelHeight="68dp"
+    app:umanoPanelHeight="@dimen/attach_drawer_panel_default_height"
     tools:context="io.eodc.ripple.Activities.ConversationActivity">
 
     <RelativeLayout
@@ -50,7 +50,9 @@
         <include
             android:id="@+id/message_composer_container"
             android:layout_width="match_parent"
-            android:layout_height="68dp"
+            android:layout_height="@dimen/attach_drawer_panel_default_height"
+            android:layout_marginStart="@dimen/message_composer_horizontal_margin"
+            android:layout_marginEnd="@dimen/message_composer_horizontal_margin"
             layout="@layout/activity_conversation_composer_drawer" />
 
         <ImageView
