@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by 2n on 1/4/18.
+ * Representation of a TextMessage Object
  */
 
 public class TextMessage implements Parcelable {
@@ -14,7 +14,18 @@ public class TextMessage implements Parcelable {
 
     public TextMessage() {}
 
-    protected TextMessage(Parcel in) {
+    public TextMessage(String content, long date) {
+        this.content = content;
+        this.date = date;
+    }
+
+    public TextMessage(String content, boolean fromUser, long date) {
+        this.content = content;
+        this.fromUser = fromUser;
+        this.date = date;
+    }
+
+    private TextMessage(Parcel in) {
         content = in.readString();
         fromUser = in.readByte() != 0;
         date = in.readLong();
@@ -32,8 +43,8 @@ public class TextMessage implements Parcelable {
         return fromUser;
     }
 
-    public void setFromUser(boolean fromUser) {
-        this.fromUser = fromUser;
+    public void setFromUser() {
+        this.fromUser = true;
     }
 
     public long getDate() {

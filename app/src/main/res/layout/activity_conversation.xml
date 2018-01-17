@@ -8,9 +8,9 @@
     android:background="@color/lightGrey"
     android:gravity="bottom"
     app:umanoFadeColor="@android:color/transparent"
-    app:umanoDragView="@id/new_message_container"
+    app:umanoDragView="@id/message_composer_container"
     app:umanoPanelHeight="@dimen/attach_drawer_panel_default_height"
-    tools:context="io.eodc.ripple.Activities.ConversationActivity">
+    tools:context="io.eodc.ripple.activities.ConversationActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
 
         <fragment
             android:id="@+id/msg_history"
-            android:name="io.eodc.ripple.Fragments.ConversationFragment"
+            android:name="io.eodc.ripple.fragments.ConversationFragment"
             android:layout_below="@id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

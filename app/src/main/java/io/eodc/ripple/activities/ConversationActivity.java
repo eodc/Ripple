@@ -1,7 +1,9 @@
-package io.eodc.ripple.Activities;
+package io.eodc.ripple.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.provider.Telephony;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,12 +14,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.r0adkll.slidr.Slidr;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import io.eodc.ripple.BuildConfig;
 import io.eodc.ripple.R;
+import io.eodc.ripple.fragments.ConversationFragment;
 import timber.log.Timber;
 
 public class ConversationActivity extends AppCompatActivity {
@@ -35,6 +39,13 @@ public class ConversationActivity extends AppCompatActivity {
         // Setup Activity Basics
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
+
+        if (!Telephony.Sms.getDefaultSmsPackage(this).equals(getPackageName())) {
+            Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
+            intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, getPackageName());
+            startActivity(intent);
+        }
+
         smsManager = SmsManager.getDefault();
         Slidr.attach(this);
 
@@ -74,18 +85,34 @@ public class ConversationActivity extends AppCompatActivity {
         mComposerLayout = findViewById(R.id.message_composer_container);
         mSendButton = findViewById(R.id.send_button);
 
+        getSupportFragmentManager().beginTransaction()
+                .add(new ConversationFragment(), "conversationFragment")
+                .commit();
     }
 
     public void sendMessage(View view) {
+        String msgContent = mMessageComposer.getText().toString();
+
+        if (msgContent != null && !msgContent.equals("")) {
+            ConversationFragment conversationFrag = (ConversationFragment) getSupportFragmentManager().findFragmentById(R.id.msg_history);
+            conversationFrag.sendMessage(msgContent);
+            mMessageComposer.setText("");
+        } else {
+            Toast.makeText(this, "Empty message...", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putString("savedMsgContent", mMessageComposer.getText().toString());
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     class TextLineCountListener implements TextWatcher {
         int numLines = 1;
 
         @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -110,15 +137,7 @@ public class ConversationActivity extends AppCompatActivity {
         }
 
         @Override
-        public void afterTextChanged(Editable editable) {
-
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        outState.putString("savedMsgContent", mMessageComposer.getText().toString());
-        super.onSaveInstanceState(outState, outPersistentState);
+        public void afterTextChanged(Editable editable) { }
     }
 }
 
