@@ -72,11 +72,9 @@ public class ConversationActivity extends AppCompatActivity {
         mAttachIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
-                    slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-                } else if (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-                    slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                }
+                SlidingUpPanelLayout.PanelState panelState = slidingLayout.getPanelState();
+                slidingLayout.setPanelState(panelState == SlidingUpPanelLayout.PanelState.COLLAPSED ?
+                        SlidingUpPanelLayout.PanelState.EXPANDED : SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
         });
         mMessageComposer = findViewById(R.id.message_composer);
