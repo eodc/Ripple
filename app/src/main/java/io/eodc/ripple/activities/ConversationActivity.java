@@ -80,7 +80,7 @@ public class ConversationActivity extends AppCompatActivity {
         mMessageComposer = findViewById(R.id.message_composer);
         mMessageComposer.addTextChangedListener(new TextLineCountListener());
 
-        mComposerLayout = findViewById(R.id.message_composer_container);
+        mComposerLayout = findViewById(R.id.msg_composer_container);
         mSendButton = findViewById(R.id.send_button);
 
         getSupportFragmentManager().beginTransaction()
@@ -114,8 +114,7 @@ public class ConversationActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (mMessageComposer.getLineCount() == 0)
-                return;
+            if (mMessageComposer.getLineCount() == 0) return;
 
             int composerHeight = mComposerLayout.getMeasuredHeight();
             RelativeLayout.LayoutParams composerLayoutParams = (RelativeLayout.LayoutParams) mComposerLayout.getLayoutParams();

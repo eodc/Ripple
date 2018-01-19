@@ -88,10 +88,8 @@ public class ConversationFragment extends Fragment {
                     int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
                     int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
                     while (cursor.moveToNext()) {
-                        TextMessage newMsg = new TextMessage();
+                        TextMessage newMsg = new TextMessage(cursor.getString(bodyIndex), cursor.getLong(dateIndex));
 
-                        newMsg.setContent(cursor.getString(bodyIndex));
-                        newMsg.setDate(cursor.getLong(dateIndex));
                         if (token == INBOX_TOKEN) {
                             messages.add(newMsg);
                             msgDates.add(newMsg.getDate());

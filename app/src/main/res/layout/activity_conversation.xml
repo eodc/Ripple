@@ -8,7 +8,7 @@
     android:background="@color/lightGrey"
     android:gravity="bottom"
     app:umanoFadeColor="@android:color/transparent"
-    app:umanoDragView="@id/message_composer_container"
+    app:umanoDragView="@id/msg_composer_container"
     app:umanoPanelHeight="@dimen/attach_drawer_panel_default_height"
     tools:context="io.eodc.ripple.activities.ConversationActivity">
 
@@ -32,8 +32,7 @@
             android:name="io.eodc.ripple.fragments.ConversationFragment"
             android:layout_below="@id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:layout="@layout/fragment_conversation" />
+            android:layout_height="match_parent" />
 
     </RelativeLayout>
 
@@ -48,7 +47,7 @@
         android:background="@android:color/white">
 
         <include
-            android:id="@+id/message_composer_container"
+            android:id="@+id/msg_composer_container"
             android:layout_width="match_parent"
             android:layout_height="@dimen/attach_drawer_panel_default_height"
             android:layout_marginStart="@dimen/message_composer_horizontal_margin"
@@ -56,14 +55,20 @@
             layout="@layout/activity_conversation_composer_drawer" />
 
         <ImageView
+            android:id="@+id/msg_drawer_divider"
             android:layout_width="match_parent"
             android:layout_height="@dimen/attach_drawer_divider_height"
             android:layout_marginStart="@dimen/attach_drawer_divider_horizontal_margin"
             android:layout_marginEnd="@dimen/attach_drawer_divider_horizontal_margin"
             android:background="@android:color/darker_gray"
-            android:layout_below="@id/message_composer_container"
-            android:contentDescription="@string/attach_drawer_divider_content_description"
-            android:id="@+id/imageView" />
+            android:layout_below="@id/msg_composer_container"
+            android:contentDescription="@string/attach_drawer_divider_content_description" />
+
+        <!-- <fragment
+            android:id="@+id/msg_attachments"
+            android:layout_below="@id/msg_drawer_divider"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" /> -->
 
     </RelativeLayout>
 
