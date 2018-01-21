@@ -5,4 +5,5 @@
     <string name="attach_drawer_divider_content_description">Below you may attach files</string>
     <string name="msg_composer_hint">Enter Message…</string>
     <string name="date_divider" translatable="false">- %s -</string>
+    <string name="item_image_attachment_description">An image from your gallery</string>
 </resources>

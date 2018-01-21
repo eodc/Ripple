@@ -23,7 +23,7 @@
         android:layout_marginEnd="@dimen/item_message_content_horizontal_margin"
         android:layout_below="@id/date_divider"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/sent_message_background"
+        android:background="@drawable/sent_msg_bg"
         android:textColor="@android:color/primary_text_dark"
         tools:text="Hello, World!"/>
     <TextView

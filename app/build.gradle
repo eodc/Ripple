@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "io.eodc.ripple"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -30,10 +30,8 @@ dependencies {
 
     // Timber https://github.com/JakeWharton/timber
     implementation 'com.jakewharton.timber:timber:4.6.0'
-    // Slidr https://github.com/r0adkll/Slidr
-    compile 'com.r0adkll:slidableactivity:2.0.6'
     // LibPhoneNumber https://github.com/googlei18n/libphonenumber
     compile 'com.googlecode.libphonenumber:libphonenumber:8.8.8'
-    // AndroidSlidingUpPanel https://github.com/umano/AndroidSlidingUpPanel
-    compile 'com.sothree.slidinguppanel:library:3.4.0'
+
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }

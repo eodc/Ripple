@@ -1,38 +1,51 @@
 package io.eodc.ripple.activities;
 
+import android.annotation.SuppressLint;
+import android.content.AsyncQueryHandler;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.provider.Telephony;
-import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.telephony.SmsMessage;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import com.r0adkll.slidr.Slidr;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import io.eodc.ripple.BuildConfig;
 import io.eodc.ripple.R;
-import io.eodc.ripple.fragments.ConversationFragment;
+import io.eodc.ripple.TextMessage;
+import io.eodc.ripple.adapters.MessageHistoryAdapter;
 import timber.log.Timber;
 
 public class ConversationActivity extends AppCompatActivity {
 
     SmsManager smsManager;
 
-    SlidingUpPanelLayout slidingLayout;
     ImageView mAttachIcon;
     EditText mMessageComposer;
-    FloatingActionButton mSendButton;
+    ImageView mSendButton;
     RelativeLayout mComposerLayout;
+
+    private static final int INBOX_TOKEN = 0;
+    private static final int SENT_TOKEN = 1;
+    MessageHistoryAdapter adapter;
+    List<TextMessage> messages;
+    RecyclerView conversationMsgs;
+    private BroadcastReceiver newSmsReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +60,59 @@ public class ConversationActivity extends AppCompatActivity {
         }
 
         smsManager = SmsManager.getDefault();
-        Slidr.attach(this);
+        mAttachIcon = findViewById(R.id.attach_icon);
+        mMessageComposer = findViewById(R.id.message_composer);
 
-        if (savedInstanceState != null) {
+        mComposerLayout = findViewById(R.id.new_message_container);
+        mSendButton = findViewById(R.id.send_button);
+
+        conversationMsgs = findViewById(R.id.conversation_msgs);
+
+        if (savedInstanceState == null) {
+            messages = new ArrayList<>();
+            final List<Long> msgDates = new ArrayList<>();
+            @SuppressLint("HandlerLeak")
+            AsyncQueryHandler queryHandler = new AsyncQueryHandler(this.getContentResolver()) {
+                @Override
+                protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                    int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
+                    int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
+                    while (cursor.moveToNext()) {
+                        TextMessage newMsg = new TextMessage(cursor.getString(bodyIndex), cursor.getLong(dateIndex));
+
+                        if (token == INBOX_TOKEN) {
+                            messages.add(newMsg);
+                            msgDates.add(newMsg.getDate());
+                        } else if (token == SENT_TOKEN) {
+                            newMsg.setFromUser();
+                            int index = Math.abs(Collections.binarySearch(msgDates, newMsg.getDate(), Collections.reverseOrder()) + 1);
+                            msgDates.add(index, newMsg.getDate());
+                            messages.add(index, newMsg);
+                        }
+                    }
+                }
+            };
+            queryHandler.startQuery(INBOX_TOKEN,
+                    null,
+                    Telephony.Sms.Inbox.CONTENT_URI,
+                    new String[]{Telephony.Sms.ADDRESS,
+                            Telephony.Sms.BODY,
+                            Telephony.Sms.DATE},
+                    Telephony.Sms.ADDRESS + "= ?",
+                    new String[]{"+16504838732"},
+                    Telephony.Sms.DEFAULT_SORT_ORDER);
+            queryHandler.startQuery(SENT_TOKEN,
+                    null,
+                    Telephony.Sms.Sent.CONTENT_URI,
+                    new String[]{Telephony.Sms.ADDRESS,
+                            Telephony.Sms.BODY,
+                            Telephony.Sms.DATE},
+                    Telephony.Sms.ADDRESS + "= ?",
+                    new String[]{"+16504838732"},
+                    Telephony.Sms.DEFAULT_SORT_ORDER);
+        } else {
             String savedMsgContent = savedInstanceState.getString("savedMsgContent");
+            messages = savedInstanceState.getParcelableArrayList("messageList");
             if (savedMsgContent != null)
                 mMessageComposer.setText(savedMsgContent);
         }
@@ -67,74 +129,71 @@ public class ConversationActivity extends AppCompatActivity {
 
         Timber.i("Toolbar initialized");
 
-        slidingLayout = findViewById(R.id.root_layout);
-        mAttachIcon = findViewById(R.id.attach_icon);
-        mAttachIcon.setOnClickListener(new View.OnClickListener() {
+        newSmsReceiver = new BroadcastReceiver() {
             @Override
-            public void onClick(View view) {
-                SlidingUpPanelLayout.PanelState panelState = slidingLayout.getPanelState();
-                slidingLayout.setPanelState(panelState == SlidingUpPanelLayout.PanelState.COLLAPSED ?
-                        SlidingUpPanelLayout.PanelState.EXPANDED : SlidingUpPanelLayout.PanelState.COLLAPSED);
+            public void onReceive(Context context, Intent intent) {
+                Bundle extras = intent.getExtras();
+                if (extras != null) {
+                    Object[] pdus = (Object[]) extras.get("pdus");
+
+                    for (Object pdu : pdus) {
+                        SmsMessage newMsg = SmsMessage.createFromPdu((byte[]) pdu);
+                        addMessageToList(new TextMessage(newMsg.getMessageBody(), System.currentTimeMillis()));
+                    }
+                    if (!isAtLastItem()) {
+                        Snackbar newMsgNotif = Snackbar.make(findViewById(R.id.root_layout), "New Message", Snackbar.LENGTH_SHORT);
+                        newMsgNotif.setAction("View", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                conversationMsgs.scrollToPosition(0);
+                            }
+                        });
+                        newMsgNotif.show();
+                    }
+                }
             }
-        });
-        mMessageComposer = findViewById(R.id.message_composer);
-        mMessageComposer.addTextChangedListener(new TextLineCountListener());
+        };
 
-        mComposerLayout = findViewById(R.id.msg_composer_container);
-        mSendButton = findViewById(R.id.send_button);
-
-        getSupportFragmentManager().beginTransaction()
-                .add(new ConversationFragment(), "conversationFragment")
-                .commit();
-    }
-
-    public void sendMessage(View view) {
-        String msgContent = mMessageComposer.getText().toString();
-
-        if (msgContent != null && !msgContent.equals("")) {
-            ConversationFragment conversationFrag = (ConversationFragment) getSupportFragmentManager().findFragmentById(R.id.msg_history);
-            conversationFrag.sendMessage(msgContent);
-            mMessageComposer.setText("");
-        } else {
-            Toast.makeText(this, "Empty message...", Toast.LENGTH_SHORT).show();
-        }
+        LinearLayoutManager rvLayoutMan = new LinearLayoutManager(this);
+        rvLayoutMan.setReverseLayout(true);
+        rvLayoutMan.setStackFromEnd(true);
+        conversationMsgs.setLayoutManager(rvLayoutMan);
+        adapter = new MessageHistoryAdapter(messages, this);
+        conversationMsgs.setAdapter(adapter);
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        outState.putString("savedMsgContent", mMessageComposer.getText().toString());
-        super.onSaveInstanceState(outState, outPersistentState);
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(newSmsReceiver);
     }
 
-    class TextLineCountListener implements TextWatcher {
-        int numLines = 1;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_DELIVER");
+        registerReceiver(newSmsReceiver, filter);
+        conversationMsgs.scrollToPosition(0);
+    }
 
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("savedMsgContent", mMessageComposer.getText().toString());
+        outState.putParcelableArrayList("messageList", (ArrayList<TextMessage>) messages);
+        super.onSaveInstanceState(outState);
+    }
 
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (mMessageComposer.getLineCount() == 0) return;
+    public void addMessageToList(TextMessage newMsg) {
+        messages.add(0, newMsg);
+        adapter.notifyDataSetChanged();
+    }
 
-            int composerHeight = mComposerLayout.getMeasuredHeight();
-            RelativeLayout.LayoutParams composerLayoutParams = (RelativeLayout.LayoutParams) mComposerLayout.getLayoutParams();
-
-            if (numLines < mMessageComposer.getLineCount() && mMessageComposer.getLineCount() <= 5) {
-                numLines = mMessageComposer.getLineCount();
-                int deltaHeight = mMessageComposer.getHeight() / numLines;
-                slidingLayout.setPanelHeight(slidingLayout.getPanelHeight() + deltaHeight);
-                composerLayoutParams.height = composerHeight + deltaHeight;
-
-            } else if (numLines > mMessageComposer.getLineCount()) {
-                numLines = mMessageComposer.getLineCount();
-                slidingLayout.setPanelHeight(mMessageComposer.getHeight());
-                composerLayoutParams.height = mMessageComposer.getHeight();
-            }
-            mComposerLayout.setLayoutParams(composerLayoutParams);
+    private boolean isAtLastItem() {
+        if (conversationMsgs.getAdapter().getItemCount() != 0) {
+            int lastVisibleItemPos = ((LinearLayoutManager) conversationMsgs.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+            return lastVisibleItemPos != RecyclerView.NO_POSITION && lastVisibleItemPos == 0;
         }
-
-        @Override
-        public void afterTextChanged(Editable editable) { }
+        return false;
     }
 }
 
