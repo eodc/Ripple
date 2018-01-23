@@ -9,17 +9,18 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.Telephony;
-import android.support.design.widget.Snackbar;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,19 +34,23 @@ import timber.log.Timber;
 
 public class ConversationActivity extends AppCompatActivity {
 
-    SmsManager smsManager;
-
-    ImageView mAttachIcon;
-    EditText mMessageComposer;
-    ImageView mSendButton;
-    RelativeLayout mComposerLayout;
 
     private static final int INBOX_TOKEN = 0;
     private static final int SENT_TOKEN = 1;
-    MessageHistoryAdapter adapter;
-    List<TextMessage> messages;
-    RecyclerView conversationMsgs;
+
     private BroadcastReceiver newSmsReceiver;
+
+    ConstraintLayout mMessageComposer;
+    RelativeLayout mComposerLayout;
+    EditText mMessageComposerInput;
+    ImageView mSendButton;
+    TextView mJumpRecents;
+    ImageView mAttachIcon;
+    RecyclerView conversationMsgs;
+
+    MessageHistoryAdapter adapter;
+
+    List<TextMessage> messages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +64,10 @@ public class ConversationActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        smsManager = SmsManager.getDefault();
         mAttachIcon = findViewById(R.id.attach_icon);
-        mMessageComposer = findViewById(R.id.message_composer);
+        mMessageComposer = findViewById(R.id.msg_composer);
+        mMessageComposerInput = findViewById(R.id.message_composer_input);
+        mJumpRecents = findViewById(R.id.jump_recents);
 
         mComposerLayout = findViewById(R.id.new_message_container);
         mSendButton = findViewById(R.id.send_button);
@@ -99,7 +105,7 @@ public class ConversationActivity extends AppCompatActivity {
                             Telephony.Sms.BODY,
                             Telephony.Sms.DATE},
                     Telephony.Sms.ADDRESS + "= ?",
-                    new String[]{"+16504838732"},
+                    new String[]{""},
                     Telephony.Sms.DEFAULT_SORT_ORDER);
             queryHandler.startQuery(SENT_TOKEN,
                     null,
@@ -108,13 +114,13 @@ public class ConversationActivity extends AppCompatActivity {
                             Telephony.Sms.BODY,
                             Telephony.Sms.DATE},
                     Telephony.Sms.ADDRESS + "= ?",
-                    new String[]{"+16504838732"},
+                    new String[]{""},
                     Telephony.Sms.DEFAULT_SORT_ORDER);
         } else {
             String savedMsgContent = savedInstanceState.getString("savedMsgContent");
             messages = savedInstanceState.getParcelableArrayList("messageList");
             if (savedMsgContent != null)
-                mMessageComposer.setText(savedMsgContent);
+                mMessageComposerInput.setText(savedMsgContent);
         }
 
         // Plant Timber tree if debug build
@@ -140,16 +146,6 @@ public class ConversationActivity extends AppCompatActivity {
                         SmsMessage newMsg = SmsMessage.createFromPdu((byte[]) pdu);
                         addMessageToList(new TextMessage(newMsg.getMessageBody(), System.currentTimeMillis()));
                     }
-                    if (!isAtLastItem()) {
-                        Snackbar newMsgNotif = Snackbar.make(findViewById(R.id.root_layout), "New Message", Snackbar.LENGTH_SHORT);
-                        newMsgNotif.setAction("View", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                conversationMsgs.scrollToPosition(0);
-                            }
-                        });
-                        newMsgNotif.show();
-                    }
                 }
             }
         };
@@ -160,6 +156,7 @@ public class ConversationActivity extends AppCompatActivity {
         conversationMsgs.setLayoutManager(rvLayoutMan);
         adapter = new MessageHistoryAdapter(messages, this);
         conversationMsgs.setAdapter(adapter);
+
     }
 
     @Override
@@ -171,14 +168,14 @@ public class ConversationActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_DELIVER");
+        IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
         registerReceiver(newSmsReceiver, filter);
         conversationMsgs.scrollToPosition(0);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("savedMsgContent", mMessageComposer.getText().toString());
+        outState.putString("savedMsgContent", mMessageComposerInput.getText().toString());
         outState.putParcelableArrayList("messageList", (ArrayList<TextMessage>) messages);
         super.onSaveInstanceState(outState);
     }
@@ -188,12 +185,27 @@ public class ConversationActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    private boolean isAtLastItem() {
-        if (conversationMsgs.getAdapter().getItemCount() != 0) {
-            int lastVisibleItemPos = ((LinearLayoutManager) conversationMsgs.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-            return lastVisibleItemPos != RecyclerView.NO_POSITION && lastVisibleItemPos == 0;
-        }
-        return false;
+    public void scrollToPresent(View view) {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) conversationMsgs.getLayoutManager();
+        int currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+        if (currentPosition < 75)
+            conversationMsgs.smoothScrollToPosition(0);
+        else
+            conversationMsgs.scrollToPosition(0);
+            showComposer();
+    }
+
+    private void showComposer() {
+        mMessageComposer.animate()
+                .setDuration(100)
+                .translationY(0);
+        mJumpRecents.startAnimation(AnimationUtils.loadAnimation(this, R.anim.collapse_recents_notif));
+        mJumpRecents.postOnAnimation(new Runnable() {
+            @Override
+            public void run() {
+                mJumpRecents.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 }
 

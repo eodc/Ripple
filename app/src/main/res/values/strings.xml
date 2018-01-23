@@ -1,9 +1,14 @@
 <resources>
 
     <string name="app_name">Ripple</string>
+
+    <string name="date_divider" translatable="false">- %s -</string>
+
+    <string name="msg_composer_hint">Enter Message…</string>
+
+    <string name="ic_image_attachment_content_description">An image from your gallery</string>
     <string name="ic_attach_content_description">Attach a file</string>
     <string name="attach_drawer_divider_content_description">Below you may attach files</string>
-    <string name="msg_composer_hint">Enter Message…</string>
-    <string name="date_divider" translatable="false">- %s -</string>
-    <string name="item_image_attachment_description">An image from your gallery</string>
+
+    <string name="jump_recents_label">↓ Jump to Present</string>
 </resources>

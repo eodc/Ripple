@@ -24,6 +24,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SENDTO" />
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <data android:scheme="sms" />

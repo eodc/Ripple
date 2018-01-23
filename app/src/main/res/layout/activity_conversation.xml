@@ -4,7 +4,7 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E0E0E0"
+    android:background="@color/lightGrey"
     android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
@@ -29,10 +29,36 @@
         android:layout_alignParentStart="true"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:paddingBottom="64dp"
+        android:scrollbars="vertical"
+        android:paddingBottom="@dimen/conversation_bottom_padding"
         app:layout_anchor="@+id/appBarLayout"
         app:layout_anchorGravity="bottom|center"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <TextView
+        android:id="@+id/jump_recents"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/jump_recents_vertical_margin"
+        android:padding="@dimen/jump_recents_padding"
+        android:background="@drawable/jump_recents_pillbox"
+        android:text="@string/jump_recents_label"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        android:onClick="scrollToPresent"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_anchor="@+id/jump_recents_spacing"
+        app:layout_anchorGravity="top|center"
+        app:layout_behavior="io.eodc.ripple.ScrollablePillboxBehavior" />
+
+    <View
+        android:id="@+id/jump_recents_spacing"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/jump_recents_bottom_spacing"
+        app:layout_anchor="@+id/msg_composer"
+        app:layout_anchorGravity="top|center" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/msg_composer"
@@ -46,18 +72,18 @@
 
         <RelativeLayout
             android:id="@+id/new_message_container"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/message_composer_container_width"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_marginBottom="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/message_composer_container_vertical_margin"
+            android:layout_marginBottom="@dimen/message_composer_container_vertical_margin"
+            android:layout_marginStart="@dimen/message_composer_container_start_margin"
+            android:layout_marginEnd="@dimen/message_composer_container_end_margin"
             android:background="@drawable/composer_pillbox"
-            android:elevation="2dp"
-            android:padding="4dp"
-            android:paddingEnd="@dimen/message_composer_horizontal_margin"
-            android:paddingStart="@dimen/message_composer_horizontal_margin"
+            android:elevation="@dimen/message_composer_container_elevation"
+            android:padding="@dimen/message_composer_container_padding"
+            android:paddingEnd="@dimen/message_composer_horizontal_padding"
+            android:paddingStart="@dimen/message_composer_horizontal_padding"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/send_button"
             app:layout_constraintStart_toStartOf="parent"
@@ -67,20 +93,22 @@
                 android:id="@+id/attach_icon"
                 android:layout_width="@dimen/attach_icon_size"
                 android:layout_height="@dimen/attach_icon_size"
+                android:padding="@dimen/attach_icon_padding"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:contentDescription="@string/ic_attach_content_description"
                 android:focusable="true"
-                android:padding="@dimen/attach_icon_padding"
                 app:srcCompat="@drawable/ic_attach_action" />
 
             <EditText
-                android:id="@+id/message_composer"
+                android:id="@+id/message_composer_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:paddingBottom="@dimen/message_composer_input_vertical_padding"
+                android:paddingTop="@dimen/message_composer_input_vertical_padding"
                 android:layout_marginEnd="@dimen/message_composer_input_horizontal_margin"
                 android:layout_marginStart="@dimen/message_composer_input_horizontal_margin"
                 android:layout_toEndOf="@id/attach_icon"
@@ -88,9 +116,7 @@
                 android:hint="@string/msg_composer_hint"
                 android:imeOptions="actionNext|flagNoExtractUi"
                 android:inputType="textShortMessage|textCapSentences|textMultiLine"
-                android:maxLines="5"
-                android:paddingBottom="8dp"
-                android:paddingTop="8dp" />
+                android:maxLines="5" />
 
         </RelativeLayout>
 
@@ -98,9 +124,7 @@
             android:id="@+id/send_button"
             android:layout_width="@dimen/send_button_size"
             android:layout_height="@dimen/send_button_size"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/send_button_end_margin"
             android:scaleType="center"
             app:layout_anchor="@+id/new_message_container"
             app:layout_anchorGravity="right|center"

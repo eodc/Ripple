@@ -2,9 +2,10 @@
 <resources>
     <dimen name="toolbar_elevation">4dp</dimen>
 
-    <dimen name="attach_icon_size">42dp</dimen>
+    <dimen name="attach_icon_size">36dp</dimen>
     <dimen name="attach_icon_padding">8dp</dimen>
-    <dimen name="send_button_size">48dp</dimen>
+
+    <dimen name="conversation_bottom_padding">64dp</dimen>
 
     <dimen name="item_message_divider_margin">8dp</dimen>
     <dimen name="item_message_content_max_width">240sp</dimen>
@@ -14,11 +15,26 @@
     <dimen name="item_message_timestamp_horizontal_margin">2dp</dimen>
     <dimen name="item_message_timestamp_text_size">12sp</dimen>
 
-    <dimen name="message_composer_horizontal_margin">8dp</dimen>
+
+    <dimen name="jump_recents_padding">8dp</dimen>
+    <dimen name="jump_recents_vertical_margin">8dp</dimen>
+    <dimen name="jump_recents_bottom_spacing">24dp</dimen>
+
+    <dimen name="message_composer_horizontal_padding">8dp</dimen>
+    <dimen name="message_composer_container_width">0dp</dimen>
+    <dimen name="message_composer_container_vertical_margin">16dp</dimen>
+    <dimen name="message_composer_container_padding">4dp</dimen>
+    <dimen name="message_composer_container_start_margin">12dp</dimen>
+    <dimen name="message_composer_container_end_margin">8dp</dimen>
+    <dimen name="message_composer_container_elevation">1dp</dimen>
     <dimen name="message_composer_input_horizontal_margin">2dp</dimen>
+    <dimen name="message_composer_input_vertical_padding">8dp</dimen>
 
     <dimen name="attach_drawer_panel_default_height">68dp</dimen>
     <dimen name="attach_drawer_divider_height">1dp</dimen>
     <dimen name="attach_drawer_divider_horizontal_margin">16dp</dimen>
     <dimen name="attach_drawer_divider_vertical_margin">8dp</dimen>
+
+    <dimen name="send_button_size">48dp</dimen>
+    <dimen name="send_button_end_margin">8dp</dimen>
 </resources>
