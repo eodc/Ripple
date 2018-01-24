@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsMessage;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -84,16 +85,21 @@ public class ConversationActivity extends AppCompatActivity {
                     int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
                     int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
                     while (cursor.moveToNext()) {
-                        TextMessage newMsg = new TextMessage(cursor.getString(bodyIndex), cursor.getLong(dateIndex));
+                        String unparsedNum = cursor.getString(cursor.getColumnIndex(Telephony.Sms.ADDRESS));
+                        String parsedNum = PhoneNumberUtils.formatNumber(unparsedNum, "us");
 
-                        if (token == INBOX_TOKEN) {
-                            messages.add(newMsg);
-                            msgDates.add(newMsg.getDate());
-                        } else if (token == SENT_TOKEN) {
-                            newMsg.setFromUser();
-                            int index = Math.abs(Collections.binarySearch(msgDates, newMsg.getDate(), Collections.reverseOrder()) + 1);
-                            msgDates.add(index, newMsg.getDate());
-                            messages.add(index, newMsg);
+                        if (parsedNum.equals("+1-650-555-1212")) {
+                            TextMessage newMsg = new TextMessage(cursor.getString(bodyIndex), cursor.getLong(dateIndex));
+
+                            if (token == INBOX_TOKEN) {
+                                messages.add(newMsg);
+                                msgDates.add(newMsg.getDate());
+                            } else if (token == SENT_TOKEN) {
+                                newMsg.setFromUser();
+                                int index = Math.abs(Collections.binarySearch(msgDates, newMsg.getDate(), Collections.reverseOrder()) + 1);
+                                msgDates.add(index, newMsg.getDate());
+                                messages.add(index, newMsg);
+                            }
                         }
                     }
                 }
@@ -104,8 +110,8 @@ public class ConversationActivity extends AppCompatActivity {
                     new String[]{Telephony.Sms.ADDRESS,
                             Telephony.Sms.BODY,
                             Telephony.Sms.DATE},
-                    Telephony.Sms.ADDRESS + "= ?",
-                    new String[]{""},
+                    null,
+                    null,
                     Telephony.Sms.DEFAULT_SORT_ORDER);
             queryHandler.startQuery(SENT_TOKEN,
                     null,
@@ -113,8 +119,8 @@ public class ConversationActivity extends AppCompatActivity {
                     new String[]{Telephony.Sms.ADDRESS,
                             Telephony.Sms.BODY,
                             Telephony.Sms.DATE},
-                    Telephony.Sms.ADDRESS + "= ?",
-                    new String[]{""},
+                    null,
+                    null,
                     Telephony.Sms.DEFAULT_SORT_ORDER);
         } else {
             String savedMsgContent = savedInstanceState.getString("savedMsgContent");
