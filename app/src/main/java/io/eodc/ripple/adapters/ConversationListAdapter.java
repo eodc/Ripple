@@ -1,25 +1,33 @@
 package io.eodc.ripple.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by 796152 on 1/24/2018.
+ * Adapter for showing the conversation list
  */
 
-public class ConversationListAdapter extends RecyclerView.Adapter {
+public class ConversationListAdapter extends RecyclerView.Adapter<ConversationListAdapter.ContactEntryViewHolder> {
+
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ContactEntryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return null;
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(ContactEntryViewHolder holder, int position) {
 
     }
 
     @Override
     public int getItemCount() {
         return 0;
+    }
+
+    class ContactEntryViewHolder extends RecyclerView.ViewHolder {
+        public ContactEntryViewHolder(View itemView) {
+            super(itemView);
+        }
     }
 }

@@ -5,31 +5,45 @@
     xmlns:tools="http://schemas.android.com/tools">
     <ImageView
         android:id="@+id/contact_photo"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_margin="8dp"
-        android:layout_centerVertical="true" />
-    <TextView
-        android:id="@+id/contact_name"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:layout_centerVertical="true"
+        android:contentDescription="Contact Photo" />
+    <RelativeLayout
+        android:id="@+id/contact_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/contact_photo"
         android:layout_alignTop="@id/contact_photo"
-        android:textSize="18sp"
-        tools:text="John Doe" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/contact_name"
-        android:layout_toEndOf="@+id/contact_photo"
-        tools:text="Lorem ipsum dolar sit amet, consecutor... " />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/contact_name"
         android:layout_marginEnd="16dp"
-        android:layout_alignParentEnd="true"
-        tools:text="4:15PM" />
+        android:layout_centerVertical="true">
+        <TextView
+            android:id="@+id/contact_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="240sp"
+            android:maxLines="1"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            tools:text="John Doe" />
+
+        <TextView
+            android:id="@+id/lastMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/contact_name"
+            tools:text="Lorem ipsum dolar sit amet, consecutor... " />
+
+        <TextView
+            android:id="@+id/lastMsgTimestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/contact_name"
+            android:layout_alignParentEnd="true"
+            android:maxWidth="64sp"
+            tools:text="12:15 PM"
+            tools:ignore="RelativeOverlap" />
+    </RelativeLayout>
 
 </RelativeLayout>
