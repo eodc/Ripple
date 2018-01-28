@@ -32,6 +32,9 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.6.0'
     // LibPhoneNumber https://github.com/googlei18n/libphonenumber
     compile 'com.googlecode.libphonenumber:libphonenumber:8.8.8'
+    // CircleImageView https://github.com/hdodenhof/CircleImageView
+    compile 'de.hdodenhof:circleimageview:2.2.0'
+
 
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }

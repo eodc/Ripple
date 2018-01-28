@@ -51,7 +51,7 @@
         android:focusable="true"
         app:layout_anchor="@+id/jump_recents_spacing"
         app:layout_anchorGravity="top|center"
-        app:layout_behavior="io.eodc.ripple.ScrollablePillboxBehavior" />
+        app:layout_behavior="io.eodc.ripple.behaviors.ScrollablePillboxBehavior" />
 
     <View
         android:id="@+id/jump_recents_spacing"
@@ -68,7 +68,7 @@
         android:layout_gravity="bottom"
         app:layout_anchor="@id/conversation_msgs"
         app:layout_anchorGravity="bottom|center"
-        app:layout_behavior="io.eodc.ripple.ScrollablePillboxBehavior">
+        app:layout_behavior="io.eodc.ripple.behaviors.ScrollablePillboxBehavior">
 
         <RelativeLayout
             android:id="@+id/new_message_container"

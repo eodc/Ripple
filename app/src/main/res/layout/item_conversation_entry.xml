@@ -6,7 +6,7 @@
     android:background="?android:attr/selectableItemBackground"
     android:padding="16dp"
     xmlns:tools="http://schemas.android.com/tools">
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/contact_photo"
         android:layout_width="48dp"
         android:layout_height="48dp"
