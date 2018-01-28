@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:padding="16dp"
     xmlns:tools="http://schemas.android.com/tools">
     <ImageView
         android:id="@+id/contact_photo"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_margin="16dp"
         android:layout_centerVertical="true"
-        android:contentDescription="Contact Photo" />
+        android:contentDescription="@string/contact_photo_content_desc" />
     <RelativeLayout
         android:id="@+id/contact_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/contact_photo"
         android:layout_alignTop="@id/contact_photo"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_centerVertical="true">
         <TextView
             android:id="@+id/contact_name"

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.eodc.ripple.R;
-import io.eodc.ripple.TextMessage;
+import io.eodc.ripple.telephony.TextMessage;
 
 /**
  * Adapter for showing the history of texts

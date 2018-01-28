@@ -1,4 +1,4 @@
-package io.eodc.ripple;
+package io.eodc.ripple.behaviors;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -11,6 +11,8 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
+
+import io.eodc.ripple.R;
 
 /**
  * Behavior for scrollable pillbox

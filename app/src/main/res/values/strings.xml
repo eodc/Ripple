@@ -6,9 +6,10 @@
 
     <string name="msg_composer_hint">Enter Message…</string>
 
-    <string name="ic_image_attachment_content_description">An image from your gallery</string>
-    <string name="ic_attach_content_description">Attach a file</string>
-    <string name="attach_drawer_divider_content_description">Below you may attach files</string>
+    <string name="ic_image_attachment_content_desc">An image from your gallery</string>
+    <string name="ic_attach_content_desc">Attach a file</string>
+    <string name="contact_photo_content_desc">Contact photo</string>
+    <string name="attach_drawer_divider_content_desc">Below you may attach files</string>
 
     <string name="jump_recents_label">↓ Jump to Present</string>
 </resources>

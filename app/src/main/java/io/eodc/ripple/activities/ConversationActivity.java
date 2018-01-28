@@ -1,12 +1,9 @@
 package io.eodc.ripple.activities;
 
-import android.annotation.SuppressLint;
-import android.content.AsyncQueryHandler;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.support.constraint.ConstraintLayout;
@@ -14,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsMessage;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -24,20 +20,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.eodc.ripple.BuildConfig;
 import io.eodc.ripple.R;
-import io.eodc.ripple.TextMessage;
 import io.eodc.ripple.adapters.MessageHistoryAdapter;
+import io.eodc.ripple.telephony.TextMessage;
+import io.eodc.ripple.util.QueryHelper;
 import timber.log.Timber;
 
 public class ConversationActivity extends AppCompatActivity {
-
-
-    private static final int INBOX_TOKEN = 0;
-    private static final int SENT_TOKEN = 1;
 
     private BroadcastReceiver newSmsReceiver;
 
@@ -78,50 +70,11 @@ public class ConversationActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             messages = new ArrayList<>();
             final List<Long> msgDates = new ArrayList<>();
-            @SuppressLint("HandlerLeak")
-            AsyncQueryHandler queryHandler = new AsyncQueryHandler(this.getContentResolver()) {
-                @Override
-                protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                    int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
-                    int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
-                    while (cursor.moveToNext()) {
-                        String unparsedNum = cursor.getString(cursor.getColumnIndex(Telephony.Sms.ADDRESS));
-                        String parsedNum = PhoneNumberUtils.formatNumber(unparsedNum, "us");
 
-                        if (parsedNum.equals("+1-650-555-1212")) {
-                            TextMessage newMsg = new TextMessage(cursor.getString(bodyIndex), cursor.getLong(dateIndex));
+            Intent startingIntent = getIntent();
+            final String phoneNum = startingIntent.getStringExtra("phoneNum");
 
-                            if (token == INBOX_TOKEN) {
-                                messages.add(newMsg);
-                                msgDates.add(newMsg.getDate());
-                            } else if (token == SENT_TOKEN) {
-                                newMsg.setFromUser();
-                                int index = Math.abs(Collections.binarySearch(msgDates, newMsg.getDate(), Collections.reverseOrder()) + 1);
-                                msgDates.add(index, newMsg.getDate());
-                                messages.add(index, newMsg);
-                            }
-                        }
-                    }
-                }
-            };
-            queryHandler.startQuery(INBOX_TOKEN,
-                    null,
-                    Telephony.Sms.Inbox.CONTENT_URI,
-                    new String[]{Telephony.Sms.ADDRESS,
-                            Telephony.Sms.BODY,
-                            Telephony.Sms.DATE},
-                    null,
-                    null,
-                    Telephony.Sms.DEFAULT_SORT_ORDER);
-            queryHandler.startQuery(SENT_TOKEN,
-                    null,
-                    Telephony.Sms.Sent.CONTENT_URI,
-                    new String[]{Telephony.Sms.ADDRESS,
-                            Telephony.Sms.BODY,
-                            Telephony.Sms.DATE},
-                    null,
-                    null,
-                    Telephony.Sms.DEFAULT_SORT_ORDER);
+            QueryHelper.queryMessages(getContentResolver(), this, phoneNum, msgDates, messages, conversationMsgs);
         } else {
             String savedMsgContent = savedInstanceState.getString("savedMsgContent");
             messages = savedInstanceState.getParcelableArrayList("messageList");
@@ -156,13 +109,6 @@ public class ConversationActivity extends AppCompatActivity {
             }
         };
 
-        LinearLayoutManager rvLayoutMan = new LinearLayoutManager(this);
-        rvLayoutMan.setReverseLayout(true);
-        rvLayoutMan.setStackFromEnd(true);
-        conversationMsgs.setLayoutManager(rvLayoutMan);
-        adapter = new MessageHistoryAdapter(messages, this);
-        conversationMsgs.setAdapter(adapter);
-
     }
 
     @Override
@@ -176,6 +122,7 @@ public class ConversationActivity extends AppCompatActivity {
         super.onResume();
         IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
         registerReceiver(newSmsReceiver, filter);
+
         conversationMsgs.scrollToPosition(0);
     }
 

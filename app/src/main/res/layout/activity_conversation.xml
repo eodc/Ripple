@@ -98,7 +98,7 @@
                 android:layout_centerVertical="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
-                android:contentDescription="@string/ic_attach_content_description"
+                android:contentDescription="@string/ic_attach_content_desc"
                 android:focusable="true"
                 app:srcCompat="@drawable/ic_attach_action" />
 

@@ -1,4 +1,4 @@
-package io.eodc.ripple;
+package io.eodc.ripple.telephony;
 
 import android.os.Parcel;
 import android.os.Parcelable;
