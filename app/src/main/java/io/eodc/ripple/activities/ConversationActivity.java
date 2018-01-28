@@ -33,15 +33,10 @@ public class ConversationActivity extends AppCompatActivity {
 
     private BroadcastReceiver newSmsReceiver;
 
-    ConstraintLayout mMessageComposer;
-    RelativeLayout mComposerLayout;
-    EditText mMessageComposerInput;
-    ImageView mSendButton;
-    TextView mJumpRecents;
-    ImageView mAttachIcon;
-    RecyclerView conversationMsgs;
-
-    MessageHistoryAdapter adapter;
+    private ConstraintLayout mMessageComposer;
+    private EditText mMessageComposerInput;
+    private TextView mJumpRecents;
+    private RecyclerView conversationMsgs;
 
     List<TextMessage> messages;
 
@@ -57,13 +52,9 @@ public class ConversationActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        mAttachIcon = findViewById(R.id.attach_icon);
         mMessageComposer = findViewById(R.id.msg_composer);
         mMessageComposerInput = findViewById(R.id.message_composer_input);
         mJumpRecents = findViewById(R.id.jump_recents);
-
-        mComposerLayout = findViewById(R.id.new_message_container);
-        mSendButton = findViewById(R.id.send_button);
 
         conversationMsgs = findViewById(R.id.conversation_msgs);
 
@@ -135,7 +126,7 @@ public class ConversationActivity extends AppCompatActivity {
 
     public void addMessageToList(TextMessage newMsg) {
         messages.add(0, newMsg);
-        adapter.notifyDataSetChanged();
+        conversationMsgs.getAdapter().notifyDataSetChanged();
     }
 
     public void scrollToPresent(View view) {
