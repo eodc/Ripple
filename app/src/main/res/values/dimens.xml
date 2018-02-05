@@ -38,4 +38,6 @@
     <dimen name="send_button_size">48dp</dimen>
     <dimen name="send_button_end_margin">8dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="no_contact_icon_size">16dp</dimen>
 </resources>

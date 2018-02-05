@@ -1,47 +1,29 @@
 package io.eodc.ripple.activities;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Telephony;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.telephony.SmsMessage;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import io.eodc.ripple.BuildConfig;
 import io.eodc.ripple.R;
-import io.eodc.ripple.adapters.MessageHistoryAdapter;
-import io.eodc.ripple.telephony.TextMessage;
-import io.eodc.ripple.util.QueryHelper;
+import io.eodc.ripple.fragments.ConversationFragment;
+import io.eodc.ripple.telephony.Conversation;
 import timber.log.Timber;
 
 public class ConversationActivity extends AppCompatActivity {
 
-    private BroadcastReceiver newSmsReceiver;
-
-    private ConstraintLayout mMessageComposer;
-    private EditText mMessageComposerInput;
-    private TextView mJumpRecents;
-    private RecyclerView conversationMsgs;
-
-    List<TextMessage> messages;
+    private ConversationFragment conversationFragment;
+    private Conversation conversation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         // Setup Activity Basics
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
@@ -52,26 +34,8 @@ public class ConversationActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        mMessageComposer = findViewById(R.id.msg_composer);
-        mMessageComposerInput = findViewById(R.id.message_composer_input);
-        mJumpRecents = findViewById(R.id.jump_recents);
-
-        conversationMsgs = findViewById(R.id.conversation_msgs);
-
-        if (savedInstanceState == null) {
-            messages = new ArrayList<>();
-            final List<Long> msgDates = new ArrayList<>();
-
-            Intent startingIntent = getIntent();
-            final String phoneNum = startingIntent.getStringExtra("phoneNum");
-
-            QueryHelper.queryMessages(getContentResolver(), this, phoneNum, msgDates, messages, conversationMsgs);
-        } else {
-            String savedMsgContent = savedInstanceState.getString("savedMsgContent");
-            messages = savedInstanceState.getParcelableArrayList("messageList");
-            if (savedMsgContent != null)
-                mMessageComposerInput.setText(savedMsgContent);
-        }
+        Intent startingIntent = getIntent();
+        conversation = startingIntent.getParcelableExtra("conversation");
 
         // Plant Timber tree if debug build
         if (BuildConfig.DEBUG)
@@ -79,77 +43,34 @@ public class ConversationActivity extends AppCompatActivity {
 
         // Initialize UI
         Toolbar mToolbar = findViewById(R.id.toolbar);
+
         setSupportActionBar(mToolbar);
-        if (getSupportActionBar() != null)
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Timber.i("Toolbar initialized");
-
-        newSmsReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Bundle extras = intent.getExtras();
-                if (extras != null) {
-                    Object[] pdus = (Object[]) extras.get("pdus");
-
-                    for (Object pdu : pdus) {
-                        SmsMessage newMsg = SmsMessage.createFromPdu((byte[]) pdu);
-                        addMessageToList(new TextMessage(newMsg.getMessageBody(), System.currentTimeMillis()));
-                    }
-                }
+            ImageView contactPic = findViewById(R.id.contact_photo);
+            TextView contactName = findViewById(R.id.contact_name);
+            contactName.setText(conversation.getName() != null ? conversation.getName() : conversation.getHumanReadableNum());
+            if (conversation.getContactPhotoURI() != null)
+                contactPic.setImageURI(Uri.parse(conversation.getContactPhotoURI()));
+            else {
+                int type = startingIntent.getIntExtra("contactType", -1);
+                contactPic.setImageDrawable(Conversation.generateContactPic(type, this));
             }
-        };
+        }
 
-    }
+        if (savedInstanceState == null) {
+            String phoneNum = conversation.getPhoneNum();
+            conversationFragment = ConversationFragment.newInstance(phoneNum);
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(newSmsReceiver);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-        registerReceiver(newSmsReceiver, filter);
-
-        conversationMsgs.scrollToPosition(0);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("savedMsgContent", mMessageComposerInput.getText().toString());
-        outState.putParcelableArrayList("messageList", (ArrayList<TextMessage>) messages);
-        super.onSaveInstanceState(outState);
-    }
-
-    public void addMessageToList(TextMessage newMsg) {
-        messages.add(0, newMsg);
-        conversationMsgs.getAdapter().notifyDataSetChanged();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.conversation_container, conversationFragment)
+                    .commit();
+        }
     }
 
     public void scrollToPresent(View view) {
-        LinearLayoutManager layoutManager = (LinearLayoutManager) conversationMsgs.getLayoutManager();
-        int currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
-        if (currentPosition < 75)
-            conversationMsgs.smoothScrollToPosition(0);
-        else
-            conversationMsgs.scrollToPosition(0);
-            showComposer();
-    }
-
-    private void showComposer() {
-        mMessageComposer.animate()
-                .setDuration(100)
-                .translationY(0);
-        mJumpRecents.startAnimation(AnimationUtils.loadAnimation(this, R.anim.collapse_recents_notif));
-        mJumpRecents.postOnAnimation(new Runnable() {
-            @Override
-            public void run() {
-                mJumpRecents.setVisibility(View.INVISIBLE);
-            }
-        });
+        conversationFragment.scrollToPresent();
     }
 }
 

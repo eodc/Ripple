@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,121 +19,56 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
             android:elevation="@dimen/toolbar_elevation"
-            android:theme="@style/Base.Theme.AppCompat" />
+            android:theme="@style/Base.Theme.AppCompat">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/contact_photo"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true" />
+
+                <TextView
+                    android:id="@+id/contact_name"
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_toEndOf="@id/contact_photo"
+                    tools:text="John Doe" />
+
+                <ImageView
+                    android:id="@+id/action_call"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="16dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    app:srcCompat="@drawable/ic_action_call" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/conversation_msgs"
+    <FrameLayout
+        android:id="@+id/conversation_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:scrollbars="vertical"
-        android:paddingBottom="@dimen/conversation_bottom_padding"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
         app:layout_anchor="@+id/appBarLayout"
         app:layout_anchorGravity="bottom|center"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-    <TextView
-        android:id="@+id/jump_recents"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/jump_recents_vertical_margin"
-        android:padding="@dimen/jump_recents_padding"
-        android:background="@drawable/jump_recents_pillbox"
-        android:text="@string/jump_recents_label"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        android:visibility="invisible"
-        android:onClick="scrollToPresent"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_anchor="@+id/jump_recents_spacing"
-        app:layout_anchorGravity="top|center"
-        app:layout_behavior="io.eodc.ripple.behaviors.ScrollablePillboxBehavior" />
-
-    <View
-        android:id="@+id/jump_recents_spacing"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/jump_recents_bottom_spacing"
-        app:layout_anchor="@+id/msg_composer"
-        app:layout_anchorGravity="top|center" />
-
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/msg_composer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="bottom"
-        app:layout_anchor="@id/conversation_msgs"
-        app:layout_anchorGravity="bottom|center"
-        app:layout_behavior="io.eodc.ripple.behaviors.ScrollablePillboxBehavior">
-
-        <RelativeLayout
-            android:id="@+id/new_message_container"
-            android:layout_width="@dimen/message_composer_container_width"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="@dimen/message_composer_container_vertical_margin"
-            android:layout_marginBottom="@dimen/message_composer_container_vertical_margin"
-            android:layout_marginStart="@dimen/message_composer_container_start_margin"
-            android:layout_marginEnd="@dimen/message_composer_container_end_margin"
-            android:background="@drawable/composer_pillbox"
-            android:elevation="@dimen/message_composer_container_elevation"
-            android:padding="@dimen/message_composer_container_padding"
-            android:paddingEnd="@dimen/message_composer_horizontal_padding"
-            android:paddingStart="@dimen/message_composer_horizontal_padding"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/send_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/attach_icon"
-                android:layout_width="@dimen/attach_icon_size"
-                android:layout_height="@dimen/attach_icon_size"
-                android:padding="@dimen/attach_icon_padding"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:contentDescription="@string/ic_attach_content_desc"
-                android:focusable="true"
-                app:srcCompat="@drawable/ic_attach_action" />
-
-            <EditText
-                android:id="@+id/message_composer_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:paddingBottom="@dimen/message_composer_input_vertical_padding"
-                android:paddingTop="@dimen/message_composer_input_vertical_padding"
-                android:layout_marginEnd="@dimen/message_composer_input_horizontal_margin"
-                android:layout_marginStart="@dimen/message_composer_input_horizontal_margin"
-                android:layout_toEndOf="@id/attach_icon"
-                android:background="@android:color/transparent"
-                android:hint="@string/msg_composer_hint"
-                android:imeOptions="actionNext|flagNoExtractUi"
-                android:inputType="textShortMessage|textCapSentences|textMultiLine"
-                android:maxLines="5" />
-
-        </RelativeLayout>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/send_button"
-            android:layout_width="@dimen/send_button_size"
-            android:layout_height="@dimen/send_button_size"
-            android:layout_marginEnd="@dimen/send_button_end_margin"
-            android:scaleType="center"
-            app:layout_anchor="@+id/new_message_container"
-            app:layout_anchorGravity="right|center"
-            app:layout_constraintBottom_toTopOf="@+id/new_message_container"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/new_message_container"
-            app:srcCompat="@drawable/ic_action_send" />
-
-    </android.support.constraint.ConstraintLayout>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:layout="@layout/fragment_conversation" />
 
 </android.support.design.widget.CoordinatorLayout>

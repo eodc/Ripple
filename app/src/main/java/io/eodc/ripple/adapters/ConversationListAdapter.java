@@ -18,22 +18,21 @@ import io.eodc.ripple.R;
 import io.eodc.ripple.activities.ConversationActivity;
 import io.eodc.ripple.telephony.Conversation;
 
+import static io.eodc.ripple.telephony.Conversation.CONTACT;
+import static io.eodc.ripple.telephony.Conversation.CONTACT_NO_PIC;
+import static io.eodc.ripple.telephony.Conversation.NO_CONTACT;
+
 /**
  * Adapter for showing the conversation list
  */
 
 public class ConversationListAdapter extends RecyclerView.Adapter<ConversationListAdapter.ContactEntryViewHolder> {
-
-    private static final int NO_CONTACT = 0;
-    private static final int CONTACT_NO_PIC = 1;
-    private static final int CONTACT = 2;
-
     private Context mContext;
     private List<Conversation> conversations;
 
-    public ConversationListAdapter(Context context, List<Conversation> conversations) {
-        mContext = context;
+    public ConversationListAdapter(List<Conversation> conversations, Context context) {
         this.conversations = conversations;
+        mContext = context;
     }
 
     @Override
@@ -56,16 +55,17 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
 
     @Override
     public void onBindViewHolder(final ContactEntryViewHolder holder, int position) {
-        Conversation conver = conversations.get(position);
-        int holderType = holder.getItemViewType();
+        final Conversation conver = conversations.get(position);
+        final int contactType = holder.getItemViewType();
 
         holder.phoneNum = conver.getPhoneNum();
         holder.lastMsg.setText(conver.getLastMsgBody());
         holder.timestamp.setText(DateUtils.formatDateTime(mContext, conver.getTimestamp(), DateUtils.FORMAT_SHOW_TIME));
 
-        switch (holderType) {
+        switch (contactType) {
             case NO_CONTACT:
-                holder.name.setText(conver.getPhoneNum());
+                holder.name.setText(conver.getHumanReadableNum());
+                holder.contactPic.setImageDrawable(Conversation.generateContactPic(contactType, mContext));
                 break;
             case CONTACT_NO_PIC:
                 holder.name.setText(conver.getName());
@@ -79,7 +79,8 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, ConversationActivity.class);
-                intent.putExtra("phoneNum", holder.phoneNum);
+                intent.putExtra("conversation", conver);
+                intent.putExtra("contactType", contactType);
                 mContext.startActivity(intent);
             }
         });
@@ -89,6 +90,8 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
     public int getItemCount() {
         return conversations.size();
     }
+
+
 
     class ContactEntryViewHolder extends RecyclerView.ViewHolder {
         RelativeLayout root;
