@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         queryHandler.startQuery(CONVERSATION_QUERY_TOKEN, null,
                 Telephony.Threads.CONTENT_URI,
                 new String[] {
+                        Telephony.Sms.THREAD_ID,
                         Telephony.Sms.ADDRESS,
                         Telephony.Sms.BODY,
                         Telephony.Sms.DATE },
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
             super(cr);
         }
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+            int idIndex = cursor.getColumnIndex(Telephony.Sms.THREAD_ID);
             int addrIndex = cursor.getColumnIndex(Telephony.Sms.ADDRESS);
             int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
             int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
@@ -121,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                                 ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI,
                                 ContactsContract.PhoneLookup.DISPLAY_NAME },
                         null, null, null);
-                Conversation conversation = new Conversation(parsedNumStr, cursor.getString(bodyIndex), cursor.getLong(dateIndex));
+                Conversation conversation = new Conversation(idIndex, parsedNumStr, cursor.getString(bodyIndex), cursor.getLong(dateIndex));
                 if (contactsLookupCursor != null && contactsLookupCursor.moveToNext()) {
                     conversation.setContactPhotoURI(contactsLookupCursor.getString(contactsLookupCursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI)));
                     conversation.setName(contactsLookupCursor.getString(contactsLookupCursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME)));

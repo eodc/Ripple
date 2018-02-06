@@ -29,9 +29,11 @@ public class Conversation implements Parcelable {
     private String lastMsgBody;
     private String contactPhotoURI;
     private long timestamp;
+    private long threadId;
 
 
-    public Conversation(String phoneNum, String lastMsgBody, long timestamp) {
+    public Conversation(long threadId, String phoneNum, String lastMsgBody, long timestamp) {
+        this.threadId = threadId;
         this.phoneNum = phoneNum;
         this.lastMsgBody = lastMsgBody;
         this.timestamp = timestamp;
@@ -82,6 +84,10 @@ public class Conversation implements Parcelable {
 
     public String getName() {
         return name;
+    }
+
+    public long getThreadId() {
+        return threadId;
     }
 
     public void setName(String name) {

@@ -62,9 +62,10 @@ public class ConversationFragment extends Fragment {
 
     }
 
-    public static ConversationFragment newInstance(String phoneNum) {
+    public static ConversationFragment newInstance(long threadId, String phoneNum) {
         ConversationFragment fragment = new ConversationFragment();
         Bundle args = new Bundle();
+        args.putLong("thread_id", threadId);
         args.putString("phoneNum", phoneNum);
         fragment.setArguments(args);
 

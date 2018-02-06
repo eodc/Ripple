@@ -61,7 +61,7 @@ public class ConversationActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             String phoneNum = conversation.getPhoneNum();
-            conversationFragment = ConversationFragment.newInstance(phoneNum);
+            conversationFragment = ConversationFragment.newInstance(conversation.getThreadId(), phoneNum);
 
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.conversation_container, conversationFragment)
