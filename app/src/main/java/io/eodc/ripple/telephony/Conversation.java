@@ -45,6 +45,7 @@ public class Conversation implements Parcelable {
         lastMsgBody = in.readString();
         contactPhotoURI = in.readString();
         timestamp = in.readLong();
+        threadId = in.readLong();
     }
 
     public static final Creator<Conversation> CREATOR = new Creator<Conversation>() {
@@ -114,6 +115,7 @@ public class Conversation implements Parcelable {
         dest.writeString(lastMsgBody);
         dest.writeString(contactPhotoURI);
         dest.writeLong(timestamp);
+        dest.writeLong(threadId);
     }
 
 

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.support.annotation.NonNull;
@@ -24,17 +25,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.eodc.ripple.R;
 import io.eodc.ripple.adapters.MessageHistoryAdapter;
 import io.eodc.ripple.telephony.TextMessage;
+import timber.log.Timber;
 
 /**
  * Fragment for Conversations, to be used in ConversationActivity and NewConversationActivity
@@ -42,8 +39,7 @@ import io.eodc.ripple.telephony.TextMessage;
 
 public class ConversationFragment extends Fragment {
 
-    private static final int INBOX_TOKEN = 0;
-    private static final int SENT_TOKEN = 1;
+    private static final int QUERY_TOKEN = 0;
 
     private AsyncQueryHandler queryHandler;
     private BroadcastReceiver newSmsReceiver;
@@ -54,6 +50,7 @@ public class ConversationFragment extends Fragment {
     private EditText mMessageComposerInput;
     private TextView mJumpRecents;
 
+    private long threadId;
     private String phoneNum;
     private List<TextMessage> messages;
 
@@ -66,7 +63,7 @@ public class ConversationFragment extends Fragment {
         ConversationFragment fragment = new ConversationFragment();
         Bundle args = new Bundle();
         args.putLong("thread_id", threadId);
-        args.putString("phoneNum", phoneNum);
+        args.putString("phone_num", phoneNum);
         fragment.setArguments(args);
 
         return fragment;
@@ -76,7 +73,8 @@ public class ConversationFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            phoneNum = getArguments().getString("phoneNum");
+            phoneNum = getArguments().getString("phone_num");
+            threadId = getArguments().getLong("thread_id");
         }
 
         mContext = getContext();
@@ -183,24 +181,13 @@ public class ConversationFragment extends Fragment {
 
     private void startQuery() {
         messages = new ArrayList<>();
-        queryHandler.startQuery(INBOX_TOKEN,
+        Uri queryUri = Uri.withAppendedPath(Telephony.MmsSms.CONTENT_CONVERSATIONS_URI, Uri.encode(String.valueOf(threadId)));
+        queryHandler.startQuery(QUERY_TOKEN,
                 null,
-                Telephony.Sms.Inbox.CONTENT_URI,
-                new String[]{Telephony.Sms.ADDRESS,
-                        Telephony.Sms.BODY,
-                        Telephony.Sms.DATE},
-                null,
-                null,
-                Telephony.Sms.DEFAULT_SORT_ORDER);
-        queryHandler.startQuery(SENT_TOKEN,
-                null,
-                Telephony.Sms.Sent.CONTENT_URI,
-                new String[]{Telephony.Sms.ADDRESS,
-                        Telephony.Sms.BODY,
-                        Telephony.Sms.DATE},
-                null,
-                null,
-                Telephony.Sms.DEFAULT_SORT_ORDER);
+                queryUri,
+                new String[] { Telephony.Sms.ADDRESS, Telephony.Sms.BODY, Telephony.Sms.DATE },
+                null, null,
+                Telephony.Sms.DEFAULT_SORT_ORDER );
     }
 
     private void displayMessages() {
@@ -218,33 +205,10 @@ public class ConversationFragment extends Fragment {
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
             int addrIndex = cursor.getColumnIndex(Telephony.Sms.ADDRESS);
             int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
-            int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
-            List<Long> msgDates = new ArrayList<>();
 
             while (cursor.moveToNext()) {
-                PhoneNumberUtil pnu = PhoneNumberUtil.getInstance();
-                Phonenumber.PhoneNumber parsedNum;
-                String parsedNumStr;
-                try {
-                    parsedNum = pnu.parse(cursor.getString(addrIndex), "US");
-                    parsedNumStr = pnu.format(parsedNum, PhoneNumberUtil.PhoneNumberFormat.E164);
-                } catch (NumberParseException e) {
-                    parsedNumStr = cursor.getString(addrIndex);
-                }
-
-                if (parsedNumStr.equals(phoneNum)) {
-                    TextMessage newMsg = new TextMessage(cursor.getString(bodyIndex), cursor.getLong(dateIndex));
-
-                    if (token == INBOX_TOKEN) {
-                        messages.add(newMsg);
-                        msgDates.add(newMsg.getDate());
-                    } else if (token == SENT_TOKEN) {
-                        newMsg.setFromUser();
-                        int index = Math.abs(Collections.binarySearch(msgDates, newMsg.getDate(), Collections.reverseOrder()) + 1);
-                        msgDates.add(index, newMsg.getDate());
-                        messages.add(index, newMsg);
-                    }
-                }
+                Timber.i(cursor.getString(addrIndex));
+                Timber.i(cursor.getString(bodyIndex));
             }
             displayMessages();
         }

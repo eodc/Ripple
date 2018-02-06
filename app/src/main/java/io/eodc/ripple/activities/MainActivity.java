@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                                 ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI,
                                 ContactsContract.PhoneLookup.DISPLAY_NAME },
                         null, null, null);
-                Conversation conversation = new Conversation(idIndex, parsedNumStr, cursor.getString(bodyIndex), cursor.getLong(dateIndex));
+                Conversation conversation = new Conversation(cursor.getLong(idIndex), parsedNumStr, cursor.getString(bodyIndex), cursor.getLong(dateIndex));
                 if (contactsLookupCursor != null && contactsLookupCursor.moveToNext()) {
                     conversation.setContactPhotoURI(contactsLookupCursor.getString(contactsLookupCursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI)));
                     conversation.setName(contactsLookupCursor.getString(contactsLookupCursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME)));

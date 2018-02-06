@@ -107,6 +107,7 @@
             android:layout_height="@dimen/send_button_size"
             android:layout_marginEnd="@dimen/send_button_end_margin"
             android:scaleType="center"
+            android:onClick="sendMessage"
             app:layout_anchor="@+id/new_message_container"
             app:layout_anchorGravity="right|center"
             app:layout_constraintBottom_toTopOf="@+id/new_message_container"
