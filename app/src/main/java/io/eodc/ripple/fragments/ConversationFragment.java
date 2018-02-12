@@ -31,7 +31,6 @@ import java.util.List;
 import io.eodc.ripple.R;
 import io.eodc.ripple.adapters.MessageHistoryAdapter;
 import io.eodc.ripple.telephony.TextMessage;
-import timber.log.Timber;
 
 /**
  * Fragment for Conversations, to be used in ConversationActivity and NewConversationActivity
@@ -203,12 +202,25 @@ public class ConversationFragment extends Fragment {
         }
 
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            int addrIndex = cursor.getColumnIndex(Telephony.Sms.ADDRESS);
             int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
+            int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
 
             while (cursor.moveToNext()) {
-                Timber.i(cursor.getString(addrIndex));
-                Timber.i(cursor.getString(bodyIndex));
+
+                // Check if message is from user
+                if (getContext() != null) {
+                    Cursor sentProviderCursor = getContext().getContentResolver()
+                            .query(Telephony.Sms.Sent.CONTENT_URI, null,
+                                    Telephony.Sms.Sent.DATE + "=?", new String[]{cursor.getString(dateIndex)},
+                                    Telephony.Sms.DEFAULT_SORT_ORDER);
+                    if (sentProviderCursor != null) {
+                        bodyIndex = sentProviderCursor.getColumnIndex(Telephony.Sms.BODY);
+                        while (sentProviderCursor.moveToNext()) {
+                            // TODO: Create new message instance that's from user
+                        }
+                        sentProviderCursor.close();
+                    }
+                }
             }
             displayMessages();
         }
