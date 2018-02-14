@@ -93,7 +93,7 @@ public class ConversationFragment extends Fragment {
 
                     for (Object pdu : pdus != null ? pdus : new Object[0]) {
                         SmsMessage newMsg = SmsMessage.createFromPdu((byte[]) pdu);
-                        addMessageToList(new TextMessage(newMsg.getMessageBody(), System.currentTimeMillis()));
+                        addMessageToList(new TextMessage(newMsg.getMessageBody(), System.currentTimeMillis()), true);
                     }
                 }
             }
@@ -151,9 +151,10 @@ public class ConversationFragment extends Fragment {
         outState.putParcelableArrayList("messages", (ArrayList<TextMessage>) messages);
     }
 
-    public void addMessageToList(TextMessage newMsg) {
-        messages.add(0, newMsg);
-        conversationMsgs.getAdapter().notifyDataSetChanged();
+    public void addMessageToList(TextMessage message, boolean newMsg) {
+        if (newMsg) messages.add(0, message);
+        else messages.add(message);
+        displayMessages();
     }
     public void scrollToPresent() {
         LinearLayoutManager layoutManager = (LinearLayoutManager) conversationMsgs.getLayoutManager();
@@ -202,27 +203,25 @@ public class ConversationFragment extends Fragment {
         }
 
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
-            int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
-
             while (cursor.moveToNext()) {
-
-                // Check if message is from user
-                if (getContext() != null) {
-                    Cursor sentProviderCursor = getContext().getContentResolver()
+                int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
+                int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
+                    Cursor sentProviderCursor = mContext.getContentResolver()
                             .query(Telephony.Sms.Sent.CONTENT_URI, null,
                                     Telephony.Sms.Sent.DATE + "=?", new String[]{cursor.getString(dateIndex)},
                                     Telephony.Sms.DEFAULT_SORT_ORDER);
-                    if (sentProviderCursor != null) {
-                        bodyIndex = sentProviderCursor.getColumnIndex(Telephony.Sms.BODY);
-                        while (sentProviderCursor.moveToNext()) {
-                            // TODO: Create new message instance that's from user
-                        }
-                        sentProviderCursor.close();
-                    }
+
+                // If message is from user
+                assert sentProviderCursor != null;
+                if (sentProviderCursor.moveToNext()) {
+                    bodyIndex = sentProviderCursor.getColumnIndex(Telephony.Sms.BODY);
+                    dateIndex = sentProviderCursor.getColumnIndex(Telephony.Sms.DATE);
+                    addMessageToList(new TextMessage(sentProviderCursor.getString(bodyIndex), true, Long.valueOf(sentProviderCursor.getString(dateIndex))), false);
+                } else {
+                    addMessageToList(new TextMessage(cursor.getString(bodyIndex), Long.valueOf(cursor.getString(dateIndex))), false);
                 }
+                sentProviderCursor.close();
             }
-            displayMessages();
         }
     }
 }

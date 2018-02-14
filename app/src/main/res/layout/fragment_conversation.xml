@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent" android:layout_width="match_parent">
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/conversation_msgs"
@@ -45,10 +46,9 @@
         android:id="@+id/message_composer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_gravity="bottom"
         app:layout_anchor="@id/conversation_msgs"
-        app:layout_anchorGravity="bottom|center"
+        app:layout_anchorGravity="bottom"
         app:layout_behavior="io.eodc.ripple.behaviors.ScrollablePillboxBehavior">
 
         <RelativeLayout
@@ -56,10 +56,10 @@
             android:layout_width="@dimen/message_composer_container_width"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="@dimen/message_composer_container_vertical_margin"
             android:layout_marginBottom="@dimen/message_composer_container_vertical_margin"
-            android:layout_marginStart="@dimen/message_composer_container_start_margin"
             android:layout_marginEnd="@dimen/message_composer_container_end_margin"
+            android:layout_marginStart="@dimen/message_composer_container_start_margin"
+            android:layout_marginTop="@dimen/message_composer_container_vertical_margin"
             android:background="@drawable/composer_pillbox"
             android:elevation="@dimen/message_composer_container_elevation"
             android:padding="@dimen/message_composer_container_padding"
@@ -74,13 +74,13 @@
                 android:id="@+id/attach_icon"
                 android:layout_width="@dimen/attach_icon_size"
                 android:layout_height="@dimen/attach_icon_size"
-                android:padding="@dimen/attach_icon_padding"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:contentDescription="@string/ic_attach_content_desc"
                 android:focusable="true"
+                android:padding="@dimen/attach_icon_padding"
                 app:srcCompat="@drawable/ic_attach_action" />
 
             <EditText
@@ -88,8 +88,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:paddingBottom="@dimen/message_composer_input_vertical_padding"
-                android:paddingTop="@dimen/message_composer_input_vertical_padding"
                 android:layout_marginEnd="@dimen/message_composer_input_horizontal_margin"
                 android:layout_marginStart="@dimen/message_composer_input_horizontal_margin"
                 android:layout_toEndOf="@id/attach_icon"
@@ -97,7 +95,9 @@
                 android:hint="@string/msg_composer_hint"
                 android:imeOptions="actionNext|flagNoExtractUi"
                 android:inputType="textShortMessage|textCapSentences|textMultiLine"
-                android:maxLines="5" />
+                android:maxLines="5"
+                android:paddingBottom="@dimen/message_composer_input_vertical_padding"
+                android:paddingTop="@dimen/message_composer_input_vertical_padding" />
 
         </RelativeLayout>
 
@@ -106,8 +106,8 @@
             android:layout_width="@dimen/send_button_size"
             android:layout_height="@dimen/send_button_size"
             android:layout_marginEnd="@dimen/send_button_end_margin"
-            android:scaleType="center"
             android:onClick="sendMessage"
+            android:scaleType="center"
             app:layout_anchor="@+id/new_message_container"
             app:layout_anchorGravity="right|center"
             app:layout_constraintBottom_toTopOf="@+id/new_message_container"
@@ -116,4 +116,5 @@
             app:srcCompat="@drawable/ic_action_send" />
 
     </android.support.constraint.ConstraintLayout>
+
 </android.support.design.widget.CoordinatorLayout>
