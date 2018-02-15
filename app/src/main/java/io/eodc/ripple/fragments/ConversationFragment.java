@@ -30,6 +30,7 @@ import java.util.List;
 
 import io.eodc.ripple.R;
 import io.eodc.ripple.adapters.MessageHistoryAdapter;
+import io.eodc.ripple.telephony.Conversation;
 import io.eodc.ripple.telephony.TextMessage;
 
 /**
@@ -93,7 +94,8 @@ public class ConversationFragment extends Fragment {
 
                     for (Object pdu : pdus != null ? pdus : new Object[0]) {
                         SmsMessage newMsg = SmsMessage.createFromPdu((byte[]) pdu);
-                        addMessageToList(new TextMessage(newMsg.getMessageBody(), System.currentTimeMillis()), true);
+                        if (Conversation.parseNumber(newMsg.getOriginatingAddress()).equals(phoneNum))
+                            addMessageToList(new TextMessage(newMsg.getMessageBody(), System.currentTimeMillis()), true);
                     }
                 }
             }

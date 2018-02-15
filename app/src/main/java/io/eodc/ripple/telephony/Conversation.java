@@ -140,4 +140,16 @@ public class Conversation implements Parcelable {
         return new LayerDrawable(layers);
     }
 
+    public static String parseNumber(String inputNum) {
+        PhoneNumberUtil pnu = PhoneNumberUtil.getInstance();
+        Phonenumber.PhoneNumber parsedNum;
+        try {
+            // Standardize Number format
+            parsedNum = pnu.parse(inputNum, "US");
+            return pnu.format(parsedNum, PhoneNumberUtil.PhoneNumberFormat.E164);
+        } catch (NumberParseException e) {
+            // Is a robonumber, ie from Twitter Digits
+            return inputNum;
+        }
+    }
 }

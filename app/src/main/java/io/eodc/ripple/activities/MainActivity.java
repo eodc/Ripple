@@ -17,10 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,25 +101,14 @@ public class MainActivity extends AppCompatActivity {
             int addrIndex = cursor.getColumnIndex(Telephony.Sms.ADDRESS);
             int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
             int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
-            PhoneNumberUtil pnu = PhoneNumberUtil.getInstance();
             while (cursor.moveToNext()) {
-                Phonenumber.PhoneNumber parsedNum;
-                String parsedNumStr;
-                try {
-                    // Standardize Number format
-                    parsedNum = pnu.parse(cursor.getString(addrIndex), "US");
-                    parsedNumStr = pnu.format(parsedNum, PhoneNumberUtil.PhoneNumberFormat.E164);
-
-                } catch (NumberParseException e) {
-                    // Is a robonumber, ie from Twitter Digits
-                    parsedNumStr = cursor.getString(addrIndex);
-                }
-                Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(parsedNumStr));
+                String phoneNum = Conversation.parseNumber(cursor.getString(addrIndex));
+                Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNum));
                 Cursor contactsLookupCursor = getContentResolver().query(uri, new String[] {
                                 ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI,
                                 ContactsContract.PhoneLookup.DISPLAY_NAME },
                         null, null, null);
-                Conversation conversation = new Conversation(cursor.getLong(idIndex), parsedNumStr, cursor.getString(bodyIndex), cursor.getLong(dateIndex));
+                Conversation conversation = new Conversation(cursor.getLong(idIndex), phoneNum, cursor.getString(bodyIndex), cursor.getLong(dateIndex));
                 if (contactsLookupCursor != null && contactsLookupCursor.moveToNext()) {
                     conversation.setContactPhotoURI(contactsLookupCursor.getString(contactsLookupCursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI)));
                     conversation.setName(contactsLookupCursor.getString(contactsLookupCursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME)));
