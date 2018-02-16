@@ -210,17 +210,22 @@ public class ConversationFragment extends Fragment {
                 int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
                     Cursor sentProviderCursor = mContext.getContentResolver()
                             .query(Telephony.Sms.Sent.CONTENT_URI, null,
-                                    Telephony.Sms.Sent.DATE + "=?", new String[]{cursor.getString(dateIndex)},
+                                    Telephony.Sms.Sent.DATE + "=?",
+                                    new String[]{cursor.getString(dateIndex)},
                                     Telephony.Sms.DEFAULT_SORT_ORDER);
 
-                // If message is from user
+                // Ok to assert cursor is null, Android provider just returns an empty cursor if none
+                // is found
                 assert sentProviderCursor != null;
+
                 if (sentProviderCursor.moveToNext()) {
-                    bodyIndex = sentProviderCursor.getColumnIndex(Telephony.Sms.BODY);
-                    dateIndex = sentProviderCursor.getColumnIndex(Telephony.Sms.DATE);
-                    addMessageToList(new TextMessage(sentProviderCursor.getString(bodyIndex), true, Long.valueOf(sentProviderCursor.getString(dateIndex))), false);
+                    addMessageToList(new TextMessage(cursor.getString(bodyIndex),
+                                    true, Long.valueOf(cursor.getString(dateIndex))),
+                            false);
                 } else {
-                    addMessageToList(new TextMessage(cursor.getString(bodyIndex), Long.valueOf(cursor.getString(dateIndex))), false);
+                    addMessageToList(new TextMessage(cursor.getString(bodyIndex),
+                                    Long.valueOf(cursor.getString(dateIndex))),
+                            false);
                 }
                 sentProviderCursor.close();
             }
