@@ -40,6 +40,7 @@ import io.eodc.ripple.telephony.TextMessage;
 public class ConversationFragment extends Fragment {
 
     private static final int QUERY_TOKEN = 0;
+    private static final int SENT = 1;
 
     private AsyncQueryHandler queryHandler;
     private BroadcastReceiver newSmsReceiver;
@@ -185,7 +186,7 @@ public class ConversationFragment extends Fragment {
         messages = new ArrayList<>();
         Uri queryUri = Uri.withAppendedPath(Telephony.MmsSms.CONTENT_CONVERSATIONS_URI, Uri.encode(String.valueOf(threadId)));
         queryHandler.startQuery(QUERY_TOKEN,
-                null,
+                threadId,
                 queryUri,
                 new String[] { Telephony.Sms.ADDRESS, Telephony.Sms.BODY, Telephony.Sms.DATE },
                 null, null,
@@ -205,29 +206,38 @@ public class ConversationFragment extends Fragment {
         }
 
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            while (cursor.moveToNext()) {
-                int bodyIndex = cursor.getColumnIndex(Telephony.Sms.BODY);
-                int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
-                    Cursor sentProviderCursor = mContext.getContentResolver()
-                            .query(Telephony.Sms.Sent.CONTENT_URI, null,
-                                    Telephony.Sms.Sent.DATE + "=?",
-                                    new String[]{cursor.getString(dateIndex)},
-                                    Telephony.Sms.DEFAULT_SORT_ORDER);
-
-                // Ok to assert cursor is null, Android provider just returns an empty cursor if none
-                // is found
-                assert sentProviderCursor != null;
-
-                if (sentProviderCursor.moveToNext()) {
-                    addMessageToList(new TextMessage(cursor.getString(bodyIndex),
-                                    true, Long.valueOf(cursor.getString(dateIndex))),
-                            false);
-                } else {
-                    addMessageToList(new TextMessage(cursor.getString(bodyIndex),
-                                    Long.valueOf(cursor.getString(dateIndex))),
-                            false);
-                }
-                sentProviderCursor.close();
+            switch (token) {
+                case QUERY_TOKEN:
+                    this.startQuery(SENT, cursor,
+                            Telephony.Sms.Sent.CONTENT_URI, new String[] { Telephony.Sms.DATE },
+                            Telephony.Sms.THREAD_ID + "=?", new String[] { String.valueOf((long) cookie) },
+                            Telephony.Sms.DEFAULT_SORT_ORDER);
+                    break;
+                case SENT + QUERY_TOKEN:
+                    int dateIndex = cursor.getColumnIndex(Telephony.Sms.DATE);
+                    long[] sentMsgsDates = new long[cursor.getCount()];
+                    int arrPos = 0;
+                    while (cursor.moveToNext()) {
+                        sentMsgsDates[arrPos] = cursor.getLong(dateIndex);
+                        arrPos++;
+                    }
+                    Cursor conversationCursor = (Cursor) cookie;
+                    int bodyIndex = conversationCursor.getColumnIndex(Telephony.Sms.BODY);
+                    dateIndex = conversationCursor.getColumnIndex(Telephony.Sms.DATE);
+                    while (conversationCursor.moveToNext()) {
+                        boolean msgAdded = false;
+                        for (long date : sentMsgsDates) {
+                            if (conversationCursor.getLong(dateIndex) == date) {
+                                addMessageToList(new TextMessage(conversationCursor.getString(bodyIndex), true, date), false);
+                                msgAdded = true;
+                                break;
+                            }
+                        }
+                        if (!msgAdded) {
+                            addMessageToList(new TextMessage(conversationCursor.getString(bodyIndex), false, conversationCursor.getLong(dateIndex)), false);
+                        }
+                    }
+                    break;
             }
         }
     }

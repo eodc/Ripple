@@ -21,7 +21,6 @@ import timber.log.Timber;
 public class ConversationActivity extends AppCompatActivity {
 
     private ConversationFragment conversationFragment;
-    private Conversation conversation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +29,8 @@ public class ConversationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
 
-        if (!Telephony.Sms.getDefaultSmsPackage(this).equals(getPackageName())) {
-            Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
-            intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, getPackageName());
-            startActivity(intent);
-        }
-
         Intent startingIntent = getIntent();
-        conversation = startingIntent.getParcelableExtra("conversation");
+        Conversation conversation = startingIntent.getParcelableExtra("conversation");
 
         // Plant Timber tree if debug build
         if (BuildConfig.DEBUG)
