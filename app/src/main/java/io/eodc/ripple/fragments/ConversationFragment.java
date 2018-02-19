@@ -29,8 +29,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -299,6 +301,21 @@ public class ConversationFragment extends Fragment {
                                 addMessageToList(m, false);
                             }
                         }
+                    } else if ("text/plain".equals(type)) {
+                        String data = cursor.getString(cursor.getColumnIndex("_data"));
+                        String body;
+                        if (data != null) {
+                            // implementation of this method below
+                            body = getMmsTextFromPartId(partId);
+                        } else {
+                            body = cursor.getString(cursor.getColumnIndex("text"));
+                        }
+                        for (MediaMessage m : mediaMessages) {
+                            if (cursor.getLong(cursor.getColumnIndex(Telephony.Mms.Part.MSG_ID)) == m.getId()) {
+                                TextMessage message = new TextMessage(body, m.isFromUser(), m.getDate());
+                                addMessageToList(message, false);
+                            }
+                        }
                     }
                 } while (cursor.moveToNext());
             }
@@ -311,6 +328,35 @@ public class ConversationFragment extends Fragment {
 
             displayMessages();
         }
+    }
+    private String getMmsTextFromPartId(String id) {
+        Uri partURI = Uri.parse("content://mms/part/" + id);
+        InputStream is = null;
+        StringBuilder sb = new StringBuilder();
+        try {
+            is = mContext.getContentResolver().openInputStream(partURI);
+            if (is != null) {
+                InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+                BufferedReader reader = new BufferedReader(isr);
+                String temp = reader.readLine();
+                while (temp != null) {
+                    sb.append(temp);
+                    temp = reader.readLine();
+                }
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+        finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    Timber.e(e);
+                }
+            }
+        }
+        return sb.toString();
     }
 
     private Bitmap getMediaFromPartId(String partId) {
