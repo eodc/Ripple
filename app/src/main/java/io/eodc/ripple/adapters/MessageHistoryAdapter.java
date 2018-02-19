@@ -6,62 +6,81 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.eodc.ripple.R;
+import io.eodc.ripple.telephony.MediaMessage;
+import io.eodc.ripple.telephony.Message;
 import io.eodc.ripple.telephony.TextMessage;
 
 /**
  * Adapter for showing the history of texts
  */
 
-public class MessageHistoryAdapter extends RecyclerView.Adapter<MessageHistoryAdapter.MessageHolder> {
+public class MessageHistoryAdapter extends RecyclerView.Adapter {
 
-    private List<TextMessage> mMessageList;
+    private List<Message> mMessageList;
     private Context mContext;
-    private int lastItemPos = -1;
 
-    private final int VIEW_TYPE_SENT = 0;
-    private final int VIEW_TYPE_SENT_DIVIDER = 2;
-    private final int VIEW_TYPE_SENT_DATE_VIS = 4;
+    private final int VIEW_TYPE_SENT = 2;
+    private final int VIEW_TYPE_SENT_DIVIDER = 4;
+    private final int VIEW_TYPE_SENT_DATE_VIS = 6;
 
     private final int VIEW_TYPE_RECEIVE = 1;
     private final int VIEW_TYPE_RECEIVE_DIVIDER = 3;
     private final int VIEW_TYPE_RECEIVE_DATE_VIS = 5;
 
-    public MessageHistoryAdapter(List<TextMessage> messageList, Context context) {
+    private final int VIEW_TYPE_SENT_MEDIA = 200;
+    private final int VIEW_TYPE_SENT_MEDIA_DIVIDER = 400;
+    private final int VIEW_TYPE_SENT_MEDIA_DATE_VIS = 600;
+
+    private final int VIEW_TYPE_RECEIVE_MEDIA = 100;
+    private final int VIEW_TYPE_RECEIVE_MEDIA_DIVIDER = 300;
+    private final int VIEW_TYPE_RECEIVE_MEDIA_DATE_VIS = 500;
+
+    private final int MEDIA_MODIFIER = 100;
+
+
+
+    public MessageHistoryAdapter(List<Message> messageList, Context context) {
         mMessageList = messageList;
         mContext = context;
     }
 
     @Override
-    public MessageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
-        if (viewType % 2 == 0) {
+        if (viewType % VIEW_TYPE_SENT_MEDIA == 0) {
+            view = LayoutInflater.from(mContext)
+                    .inflate(R.layout.item_media_message_sent, parent, false);
+            return new MediaMessageHolder(view);
+        } else if (viewType % VIEW_TYPE_RECEIVE_MEDIA == 0) {
+            view = LayoutInflater.from(mContext)
+                    .inflate(R.layout.item_media_message_received, parent, false);
+            return new MediaMessageHolder(view);
+        } else if (viewType % VIEW_TYPE_SENT == 0) {
             view = LayoutInflater.from(mContext)
                     .inflate(R.layout.item_message_sent, parent, false);
-            return new MessageHolder(view);
-        } else if (viewType % 2 == 1) {
+            return new TextMessageHolder(view);
+        } else if (viewType % VIEW_TYPE_RECEIVE == 0) {
             view = LayoutInflater.from(mContext)
                     .inflate(R.layout.item_message_received, parent, false);
-            return new MessageHolder(view);
+            return new TextMessageHolder(view);
         } else
             return null;
     }
 
     @Override
     public int getItemViewType(int position) {
-        TextMessage message = mMessageList.get(position);
+        Message message = mMessageList.get(position);
         if (position < mMessageList.size() - 1) {
-            TextMessage lastMsg = mMessageList.get(position + 1);
+            Message lastMsg =  mMessageList.get(position + 1);
 
             Calendar thisMsgCal = Calendar.getInstance();
             Calendar lastMsgCal = Calendar.getInstance();
@@ -73,60 +92,106 @@ public class MessageHistoryAdapter extends RecyclerView.Adapter<MessageHistoryAd
                     thisMsgCal.get(Calendar.DAY_OF_YEAR) == lastMsgCal.get(Calendar.DAY_OF_YEAR))) {
                 // Not from same day
                 if (message.isFromUser())
-                    return VIEW_TYPE_SENT_DIVIDER;
+                    if (isSms(message))
+                        return VIEW_TYPE_SENT_DIVIDER;
+                    else
+                        return VIEW_TYPE_SENT_MEDIA_DIVIDER;
                 else
-                    return VIEW_TYPE_RECEIVE_DIVIDER;
+                    if (isSms(message))
+                        return VIEW_TYPE_RECEIVE_DIVIDER;
+                    else
+                        return VIEW_TYPE_RECEIVE_MEDIA_DIVIDER;
             } else if (minSinceLastMsg > 30) {
                 // 30 mins since last message
                 if (message.isFromUser())
-                    return VIEW_TYPE_SENT_DATE_VIS;
+                    if (isSms(message))
+                        return VIEW_TYPE_SENT_DATE_VIS;
+                    else
+                        return VIEW_TYPE_SENT_MEDIA_DATE_VIS;
                 else
-                    return VIEW_TYPE_RECEIVE_DATE_VIS;
+                    if (isSms(message))
+                        return VIEW_TYPE_RECEIVE_DATE_VIS;
+                    else
+                        return VIEW_TYPE_RECEIVE_MEDIA_DATE_VIS;
             }
         } else if (position == mMessageList.size() - 1) {
             if (message.isFromUser())
-                return VIEW_TYPE_SENT_DIVIDER;
+                if (isSms(message))
+                    return VIEW_TYPE_SENT_DIVIDER;
+                else
+                    return VIEW_TYPE_SENT_MEDIA_DIVIDER;
             else
-                return VIEW_TYPE_RECEIVE_DIVIDER;
+                if (isSms(message))
+                    return VIEW_TYPE_RECEIVE_DIVIDER;
+                else
+                    return VIEW_TYPE_RECEIVE_MEDIA_DIVIDER;
         }
         if (message.isFromUser())
-            return VIEW_TYPE_SENT;
+            if (isSms(message))
+                return VIEW_TYPE_SENT;
+            else
+                return VIEW_TYPE_SENT_MEDIA;
         else
-            return VIEW_TYPE_RECEIVE;
+            if (isSms(message))
+                return VIEW_TYPE_RECEIVE;
+            else
+                return VIEW_TYPE_RECEIVE_MEDIA;
     }
 
     @Override
-    public void onBindViewHolder(MessageHolder holder, int position) {
-        TextMessage message = mMessageList.get(position);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         int holderType = holder.getItemViewType();
+        if (holderType % MEDIA_MODIFIER != 0) {
+            TextMessage message = (TextMessage) mMessageList.get(position);
+            TextMessageHolder textMessageHolder = (TextMessageHolder) holder;
 
-        final TextView content = holder.content;
-        final TextView date = holder.date;
+            final TextView content = textMessageHolder.content;
+            final TextView date = textMessageHolder.date;
 
-        content.setText(message.getContent());
-        date.setText(DateUtils.formatDateTime(mContext, message.getDate(), DateUtils.FORMAT_SHOW_TIME));
+            content.setText(message.getContent());
+            date.setText(DateUtils.formatDateTime(mContext, message.getDate(), DateUtils.FORMAT_SHOW_TIME));
 
-        content.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int dateVisibility = date.getVisibility();
-                date.setVisibility(dateVisibility == View.GONE ? View.VISIBLE : View.GONE);
+            content.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int dateVisibility = date.getVisibility();
+                    date.setVisibility(dateVisibility == View.GONE ? View.VISIBLE : View.GONE);
+                }
+            });
+
+            if (holderType == VIEW_TYPE_RECEIVE_DATE_VIS || holderType == VIEW_TYPE_SENT_DATE_VIS)
+                date.setVisibility(View.VISIBLE);
+
+            else if (holderType == VIEW_TYPE_RECEIVE_DIVIDER || holderType == VIEW_TYPE_SENT_DIVIDER) {
+                textMessageHolder.divider.setText(mContext.getString(R.string.date_divider,
+                        DateUtils.formatDateTime(mContext,
+                                message.getDate(),
+                                DateUtils.FORMAT_ABBREV_MONTH | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY)));
+                textMessageHolder.divider.setVisibility(View.VISIBLE);
+                date.setVisibility(View.VISIBLE);
             }
-        });
+        } else {
+            MediaMessage message = (MediaMessage) mMessageList.get(position);
+            MediaMessageHolder mediaMessageHolder = (MediaMessageHolder) holder;
 
-        if (holderType == VIEW_TYPE_RECEIVE_DATE_VIS || holderType == VIEW_TYPE_SENT_DATE_VIS)
-            date.setVisibility(View.VISIBLE);
+            final ImageView media = mediaMessageHolder.media;
+            final TextView date = mediaMessageHolder.date;
 
-        else if (holderType == VIEW_TYPE_RECEIVE_DIVIDER || holderType == VIEW_TYPE_SENT_DIVIDER) {
-            holder.divider.setText(mContext.getString(R.string.date_divider,
-                    DateUtils.formatDateTime(mContext,
-                            message.getDate(),
-                            DateUtils.FORMAT_ABBREV_MONTH | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY)));
-            holder.divider.setVisibility(View.VISIBLE);
-            date.setVisibility(View.VISIBLE);
+            media.setImageBitmap(message.getMedia());
+            date.setText(DateUtils.formatDateTime(mContext, message.getDate(), DateUtils.FORMAT_SHOW_TIME));
+
+            if (holderType == VIEW_TYPE_RECEIVE_MEDIA_DATE_VIS || holderType == VIEW_TYPE_SENT_MEDIA_DATE_VIS)
+                date.setVisibility(View.VISIBLE);
+
+            else if (holderType == VIEW_TYPE_RECEIVE_MEDIA_DIVIDER || holderType == VIEW_TYPE_SENT_MEDIA_DIVIDER) {
+                mediaMessageHolder.divider.setText(mContext.getString(R.string.date_divider,
+                        DateUtils.formatDateTime(mContext,
+                                message.getDate(),
+                                DateUtils.FORMAT_ABBREV_MONTH | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY)));
+                mediaMessageHolder.divider.setVisibility(View.VISIBLE);
+                date.setVisibility(View.VISIBLE);
+            }
         }
-
-        setAnimation(holder, message);
     }
 
     @Override
@@ -134,38 +199,29 @@ public class MessageHistoryAdapter extends RecyclerView.Adapter<MessageHistoryAd
         return mMessageList.size();
     }
 
-
-    @Override
-    public void onViewDetachedFromWindow(MessageHolder holder) {
-        holder.itemView.clearAnimation();
+    private boolean isSms(Message message) {
+        return message.getDiscrim() == Message.SMS;
     }
 
-    private void setAnimation(MessageHolder holder, TextMessage message) {
-        Collections.reverse(mMessageList);
-        int position = mMessageList.indexOf(message);
-        if (position > lastItemPos) {
-            Animation animation;
-            int viewType = holder.getItemViewType();
-            if (viewType % 2 == 0)
-                animation = AnimationUtils.loadAnimation(mContext, R.anim.outgoing_message);
-            else if (viewType % 2 == 1)
-                animation = AnimationUtils.loadAnimation(mContext, R.anim.incoming_message);
-            else
-                return;
-            holder.itemView.startAnimation(animation);
-            lastItemPos = position;
-        }
-        Collections.reverse(mMessageList);
-    }
-
-    class MessageHolder extends RecyclerView.ViewHolder {
+    class TextMessageHolder extends RecyclerView.ViewHolder {
         TextView content, date, divider;
-        MessageHolder(View itemView) {
+        TextMessageHolder(View itemView) {
             super(itemView);
 
             content = itemView.findViewById(R.id.message_text);
             date = itemView.findViewById(R.id.timestamp);
             divider = itemView.findViewById(R.id.date_divider);
+        }
+    }
+    class MediaMessageHolder extends RecyclerView.ViewHolder {
+        TextView date, divider;
+        ImageView media;
+        MediaMessageHolder(View itemView) {
+            super(itemView);
+
+            date = itemView.findViewById(R.id.timestamp);
+            divider = itemView.findViewById(R.id.date_divider);
+            media = itemView.findViewById(R.id.media);
         }
     }
 }

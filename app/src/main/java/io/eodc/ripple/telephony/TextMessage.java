@@ -11,13 +11,13 @@ public class TextMessage extends Message implements Parcelable {
 
     private String content;
 
-    public TextMessage(String content, long date) {
-        super(date);
+    public TextMessage(String content, boolean fromUser, long date) {
+        super(fromUser, date, Message.SMS);
         this.content = content;
     }
 
-    public TextMessage(String content, boolean fromUser, long date) {
-        super(fromUser, date);
+    public TextMessage(String content, long date) {
+        super(false, date, Message.SMS);
         this.content = content;
     }
 
@@ -31,14 +31,9 @@ public class TextMessage extends Message implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeString(content);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+    public void writeToParcel(Parcel parcel, int flags) {
+        super.writeToParcel(parcel, flags);
+        parcel.writeString(content);
     }
 
     public static final Creator<TextMessage> CREATOR = new Creator<TextMessage>() {
